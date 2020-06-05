@@ -1,16 +1,21 @@
 package network.server;
 
+import java.io.DataInput;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
 
 public class Server {
 
     private final int port = 25000;
     private ServerSocket serverSocket;
+    private ArrayList<ServerClient> clients = new ArrayList<>();
+    private ArrayList<Thread> clientThreads = new ArrayList<>();
 
     public static void main(String[] args) {
-
         System.out.println("Server setting up");
         Server server = new Server();
         server.connect();
@@ -20,23 +25,35 @@ public class Server {
         try {
             this.serverSocket = new ServerSocket(port);
 
-            Socket socket = this.serverSocket.accept();
+            boolean isRunning = true;
 
-            System.out.println("Client connected via address: " + socket.getInetAddress().getHostName());
+            while(isRunning) {
+                System.out.println("Waiting for clients...");
+                Socket socket = this.serverSocket.accept();
 
-            while(true){
-                int c = socket.getInputStream().read();
-                System.out.println("Received: " + c);
-                if(c == '1') { break; }
+                System.out.println("Client connected via address: " + socket.getInetAddress().getHostName());
+
+                ServerClient serverClient = new ServerClient(socket, "", this);
+                Thread thread = new Thread(serverClient);
+                thread.start();
+                this.clientThreads.add(thread);
+                this.clients.add(serverClient);
+
+                for(ServerClient c : this.clients){
+                    c.writeUTF("Client connected via address: " + socket.getInetAddress().getHostName());
+                }
             }
 
-            socket.close();
+
             this.serverSocket.close();
-
-
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
+    public void sendToAllClients(String text){
+        for(ServerClient c : this.clients){
+            c.writeUTF(text);
+        }
+    }
 }
