@@ -33,11 +33,17 @@ public class Server {
 
                 System.out.println("Client connected via address: " + socket.getInetAddress().getHostName());
 
-                ServerClient serverClient = new ServerClient(socket, "", this);
+                DataInputStream in = new DataInputStream(socket.getInputStream());
+                String nickName = in.readUTF();
+
+                ServerClient serverClient = new ServerClient(socket, nickName, this);
                 Thread thread = new Thread(serverClient);
                 thread.start();
+                serverClient.setThread(thread);
                 this.clientThreads.add(thread);
                 this.clients.add(serverClient);
+
+                System.out.println("Connected clients: " + this.clients.size());
 
                 for(ServerClient c : this.clients){
                     c.writeUTF("Client connected via address: " + socket.getInetAddress().getHostName());
@@ -55,5 +61,18 @@ public class Server {
         for(ServerClient c : this.clients){
             c.writeUTF(text);
         }
+    }
+
+    public void removeClient(ServerClient serverClient) {
+        this.clients.remove(serverClient);
+
+        Thread t = serverClient.getThread();
+        try{
+            t.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        this.clientThreads.remove(serverClient.getThread());
+        System.out.println("Connected clients: " + this.clients.size());
     }
 }

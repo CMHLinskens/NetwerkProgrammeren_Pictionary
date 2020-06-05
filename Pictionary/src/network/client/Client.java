@@ -10,6 +10,7 @@ public class Client {
 
     private String hostname;
     private int port;
+    private boolean isConnected = true;
 
 
     public static void main(String[] args){
@@ -32,31 +33,48 @@ public class Client {
             DataInputStream in = new DataInputStream(socket.getInputStream());
             DataOutputStream out = new DataOutputStream(socket.getOutputStream());
 
+            System.out.println("Enter a nickname: ");
+            String nickName = scanner.nextLine();
+            out.writeUTF(nickName);
+
+            System.out.println("You are now connected as " + nickName);
+
             String input = "";
 
             Thread readSocketThread = new Thread( () -> {
-                String received = "";
-                while(true){
-                    try {
-                        received = in.readUTF();
-                        System.out.println("Client received: " + received);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
+                receiveDataFromSocket(in);
             });
 
             readSocketThread.start();
 
-            while(!input.equals("quit")){
+            while(!input.equals("\\quit")){
                 input = scanner.nextLine();
                 out.writeUTF(input);
-                System.out.println("Sended: " + input);
             }
+        isConnected = false;
 
+            socket.close();
+
+            try {
+                readSocketThread.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
 
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    private void receiveDataFromSocket(DataInputStream in){
+        String received = "";
+        while(isConnected) {
+            try {
+                received = in.readUTF();
+                System.out.println(received);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 }

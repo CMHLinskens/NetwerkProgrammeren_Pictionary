@@ -11,7 +11,11 @@ public class ServerClient implements Runnable{
     private DataOutputStream out;
     private String name;
     private Server server;
+    private Thread thread;
     private boolean isConnected;
+
+    public Thread getThread() { return this.thread; }
+    public void setThread(Thread thread) { this.thread = thread; }
 
     public ServerClient(Socket socket, String name, Server server) {
         this.socket = socket;
@@ -41,8 +45,13 @@ public class ServerClient implements Runnable{
         while(isConnected){
             try {
                 String received = this.in.readUTF();
-                this.server.sendToAllClients("Received from: " + this.name + ": " + received);
-            } catch (IOException e) {
+                if(received.equals("\\quit")){
+                    isConnected = false;
+                    this.server.removeClient(this);
+                } else {
+                    this.server.sendToAllClients("<" + this.name + "> : " + received);
+                }
+                } catch (IOException e) {
                 e.printStackTrace();
             }
         }
