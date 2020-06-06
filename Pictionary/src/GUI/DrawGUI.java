@@ -14,10 +14,13 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import org.jfree.fx.FXGraphics2D;
 
+import java.awt.*;
 import java.awt.geom.Ellipse2D;
+import java.awt.geom.Rectangle2D;
 
 public class DrawGUI {
-        private Canvas canvas;
+        private Canvas drawCanvas;
+        private Canvas guessCanvas;
         private BorderPane mainPane;
         private Button buttonVoteKick;
         private TextArea textAreaChat;
@@ -28,17 +31,17 @@ public class DrawGUI {
             Stage stage = new Stage();
             mainPane = getNewMainPane();
 
-            canvas = new Canvas(800,720);
-            mainPane.setCenter(canvas);
-            FXGraphics2D g2d = new FXGraphics2D(canvas.getGraphicsContext2D());
+            FXGraphics2D drawG2d = new FXGraphics2D(drawCanvas.getGraphicsContext2D());
+            clearDrawCanvas(drawG2d);
+            FXGraphics2D guessG2d = new FXGraphics2D(guessCanvas.getGraphicsContext2D());
+            clearGuessCanvas(guessG2d);
 
-            canvas.setOnMouseDragged(e ->
-                    g2d.fill(new Ellipse2D.Double(e.getX(), e.getY(), 10, 10)));
+            applyPaintableMouse(drawG2d);
 
             InvalidationListener listener = new InvalidationListener() {
                 @Override
                 public void invalidated(Observable o) {
-                    textAreaChat.setPrefHeight(mainPane.getHeight() - 100);
+                    textAreaChat.setPrefHeight(mainPane.getHeight() - 95);
                 }};
 
             mainPane.widthProperty().addListener(listener);
@@ -62,15 +65,42 @@ public class DrawGUI {
 
             VBox rightVBox = new VBox();
             textAreaChat = new TextArea();
+            textAreaChat.setEditable(false);
             textFieldChatInput = new TextField();
+            textFieldChatInput.setPromptText("Type your guess here...");
             rightVBox.getChildren().addAll(textAreaChat, textFieldChatInput);
             rightVBox.setAlignment(Pos.BOTTOM_RIGHT);
             rightVBox.setPrefHeight(borderPane.getHeight());
             rightVBox.setPrefWidth(200);
             borderPane.setRight(rightVBox);
 
+            drawCanvas = new Canvas(800,620);
+            borderPane.setCenter(drawCanvas);
+
+            guessCanvas = new Canvas(1150, 70);
+            borderPane.setTop(guessCanvas);
             borderPane.setPrefHeight(500);
             borderPane.setPrefWidth(1000);
             return borderPane;
+        }
+
+        public void clearDrawCanvas(FXGraphics2D g2d){
+            g2d.setBackground(Color.BLACK);
+            g2d.clearRect(0, 0, (int) drawCanvas.getWidth(), (int) drawCanvas.getHeight());
+            g2d.setColor(Color.WHITE);
+            g2d.fill(new Rectangle2D.Double(5, 0, drawCanvas.getWidth() - 10 , drawCanvas.getHeight()));
+            g2d.setColor(Color.BLACK);
+        }
+
+        public void clearGuessCanvas(FXGraphics2D g2d){
+            g2d.setBackground(Color.white);
+            g2d.clearRect(0, 0, (int) guessCanvas.getWidth(), (int) guessCanvas.getHeight());
+            g2d.setPaint(Color.BLACK);
+            g2d.fill(new Rectangle2D.Double(0,guessCanvas.getHeight() - 5, guessCanvas.getWidth(), guessCanvas.getHeight()));
+        }
+
+        public void applyPaintableMouse(FXGraphics2D drawG2d) {
+            drawCanvas.setOnMouseDragged(e ->
+                    drawG2d.fill(new Ellipse2D.Double(e.getX(), e.getY(), 10, 10)));
         }
 }
