@@ -1,0 +1,9 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Pictionary" type="Application" factoryName="Application">
+    <option name="MAIN_CLASS_NAME" value="network.server.Server" />
+    <module name="Pictionary" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>
