@@ -1,6 +1,6 @@
 package data;
 
-import javafx.scene.paint.Color;
+import java.awt.*;
 
 public class DrawData {
     private int xPos, yPos;

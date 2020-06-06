@@ -12,6 +12,7 @@ public class Server {
     private ServerSocket serverSocket;
     private ArrayList<ServerClient> clients = new ArrayList<>();
     private ArrayList<Thread> clientThreads = new ArrayList<>();
+    private boolean isRunning;
 
     public static void main(String[] args) {
         System.out.println("Server setting up");
@@ -27,7 +28,7 @@ public class Server {
         try {
             this.serverSocket = new ServerSocket(port);
 
-            boolean isRunning = true;
+            isRunning = true;
 
             while(isRunning) {
                 System.out.println("Waiting for clients...");
@@ -53,7 +54,6 @@ public class Server {
                     c.writeUTF("Client connected via address: " + socket.getInetAddress().getHostName());
                 }
             }
-
 
             this.serverSocket.close();
         } catch (IOException e) {
@@ -84,5 +84,9 @@ public class Server {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+    }
+
+    public void terminate(){
+        this.isRunning = false;
     }
 }

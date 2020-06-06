@@ -4,12 +4,14 @@ import GUI.DrawGUI;
 import GUI.LoginGUI;
 import data.DataSingleton;
 import data.DrawData;
-import javafx.scene.paint.Color;
 
+import java.awt.*;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.util.Observable;
+import java.util.Observer;
 import java.util.Scanner;
 
 import static javafx.application.Application.launch;
@@ -21,6 +23,7 @@ public class Client {
     private boolean isConnected = true;
     private Socket socket;
     private boolean isDrawing = false;
+    private DrawData currentDrawData;
 
     public static void main(String[] args){
         Client client = new Client();
@@ -125,12 +128,11 @@ public class Client {
             try {
                 received = in.readUTF();
                 if(received.substring(0,2).equals('\u0001' + ",")){
-                    if(!isDrawing) {
+                    if(!DataSingleton.getInstance().isDrawing()) {
                         Scanner scanner = new Scanner(received);
                         scanner.useDelimiter(",");
                         scanner.next();
-                        DataSingleton.getInstance().setDrawData(new DrawData(Integer.parseInt(scanner.next()), Integer.parseInt(scanner.next()), Integer.parseInt(scanner.next()), Color.BLACK));
-                        //System.out.println(newDrawData.toString());
+                        DataSingleton.getInstance().setDrawData(new DrawData(Integer.parseInt(scanner.next()), Integer.parseInt(scanner.next()), Integer.parseInt(scanner.next()), Color.black));
                     }
                 } else {
                     System.out.println(received);
@@ -156,11 +158,13 @@ public class Client {
     }
 
     private void sendDrawDataFromSocket(DataOutputStream out){
-        DataSingleton.getInstance().setDrawData(new DrawData(50, 100, 20, Color.BLACK));
         while(isConnected) {
-            while (isDrawing){
+            while (DataSingleton.getInstance().isDrawing()){
                 try {
-                    out.writeUTF(DataSingleton.getInstance().getDrawData().toString());
+                    if(DataSingleton.getInstance().getDrawData() != currentDrawData) {
+                        currentDrawData = DataSingleton.getInstance().getDrawData();
+                        out.writeUTF(DataSingleton.getInstance().getDrawData().toString());
+                    }
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -177,7 +181,7 @@ public class Client {
         ServerHost serverHost = new ServerHost(port);
         Thread hostingThread = new Thread(serverHost);
         hostingThread.start();
-        isDrawing = true;
+        DataSingleton.getInstance().setDrawing(true);
         return clientSetup(nickname, port);
     }
 }
