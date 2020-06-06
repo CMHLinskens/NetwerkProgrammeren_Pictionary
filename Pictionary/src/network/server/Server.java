@@ -1,8 +1,6 @@
 package network.server;
 
-import java.io.DataInput;
 import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -10,15 +8,19 @@ import java.util.ArrayList;
 
 public class Server {
 
-    private final int port = 25000;
+    private final int port;
     private ServerSocket serverSocket;
     private ArrayList<ServerClient> clients = new ArrayList<>();
     private ArrayList<Thread> clientThreads = new ArrayList<>();
 
     public static void main(String[] args) {
         System.out.println("Server setting up");
-        Server server = new Server();
+        Server server = new Server(25000);
         server.connect();
+    }
+
+    public Server(int port){
+        this.port = port;
     }
 
     public void connect() {
@@ -68,11 +70,13 @@ public class Server {
 
         Thread t = serverClient.getThread();
         try{
+            this.clientThreads.remove(serverClient.getThread());
+            System.out.println("Client disconnected.");
+            sendToAllClients("<" + serverClient.getName() + "> : " + "Disconnected");
+            System.out.println("Connected clients: " + this.clients.size());
             t.join();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        this.clientThreads.remove(serverClient.getThread());
-        System.out.println("Connected clients: " + this.clients.size());
     }
 }
