@@ -12,7 +12,7 @@ public final class DataSingleton {
     private DataSingleton() {
     }
 
-    public static DataSingleton getInstance() {
+    public synchronized static DataSingleton getInstance() {
         if(INSTANCE == null) {
             INSTANCE = new DataSingleton();
         }
