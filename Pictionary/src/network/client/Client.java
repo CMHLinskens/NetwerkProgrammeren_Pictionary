@@ -27,8 +27,8 @@ public class Client {
     public Client(){
     }
 
-    public boolean clientSetup(String nickname, String hostname, int port){
-        this.hostname = hostname;
+    public boolean clientSetup(String nickname, int port){
+        this.hostname = "localhost";
         this.port = port;
 
         return connect(nickname);
@@ -126,5 +126,12 @@ public class Client {
             }
         }
         startDisconnect();
+    }
+
+    public boolean hostSession(String nickname, int port){
+        ServerHost serverHost = new ServerHost(port);
+        Thread hostingThread = new Thread(serverHost);
+        hostingThread.start();
+        return clientSetup(nickname, port);
     }
 }

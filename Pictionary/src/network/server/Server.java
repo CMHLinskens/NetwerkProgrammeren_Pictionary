@@ -8,15 +8,19 @@ import java.util.ArrayList;
 
 public class Server {
 
-    private final int port = 25000;
+    private final int port;
     private ServerSocket serverSocket;
     private ArrayList<ServerClient> clients = new ArrayList<>();
     private ArrayList<Thread> clientThreads = new ArrayList<>();
 
     public static void main(String[] args) {
         System.out.println("Server setting up");
-        Server server = new Server();
+        Server server = new Server(25000);
         server.connect();
+    }
+
+    public Server(int port){
+        this.port = port;
     }
 
     public void connect() {
