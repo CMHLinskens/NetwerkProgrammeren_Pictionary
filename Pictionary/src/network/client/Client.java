@@ -1,5 +1,6 @@
 package network.client;
 
+import GUI.DrawGUI;
 import GUI.LoginGUI;
 import data.DataSingleton;
 
@@ -48,6 +49,9 @@ public class Client {
             out.writeUTF(nickName);
 
             System.out.println("You are now connected as " + nickName);
+
+            DrawGUI drawGUI = new DrawGUI();
+            drawGUI.start();
 
             Thread readSocketThread = new Thread( () -> {
                 if(isConnected) {
