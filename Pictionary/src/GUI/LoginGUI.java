@@ -30,8 +30,11 @@ public class LoginGUI extends Application{
             labels.setSpacing(20);
 
             TextField nickNameTextField = new TextField();
+            nickNameTextField.setText("Default");
             TextField hostNameTextField = new TextField();
+            hostNameTextField.setText("localhost");
             TextField portTextField = new TextField();
+            portTextField.setText("25000");
             VBox textFields = new VBox();
             textFields.getChildren().addAll(nickNameTextField, hostNameTextField, portTextField);
             textFields.setSpacing(10);
