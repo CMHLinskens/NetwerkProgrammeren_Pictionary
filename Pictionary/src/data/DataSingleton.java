@@ -2,8 +2,6 @@ package data;
 
 import network.client.Client;
 
-import java.util.ArrayList;
-
 public final class DataSingleton {
 
     private static DataSingleton INSTANCE;

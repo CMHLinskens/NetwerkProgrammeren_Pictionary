@@ -43,7 +43,9 @@ public class Server {
                 thread.start();
                 serverClient.setThread(thread);
                 this.clientThreads.add(thread);
-                this.clients.add(serverClient);
+                synchronized (this.clients) {
+                    this.clients.add(serverClient);
+                }
 
                 System.out.println("Connected clients: " + this.clients.size());
 
@@ -59,9 +61,11 @@ public class Server {
         }
     }
 
-    public void sendToAllClients(String text){
-        for(ServerClient c : this.clients){
-            c.writeUTF(text);
+    public synchronized void sendToAllClients(String text){
+        synchronized (this.clients) {
+            for (ServerClient c : this.clients) {
+                c.writeUTF(text);
+            }
         }
     }
 

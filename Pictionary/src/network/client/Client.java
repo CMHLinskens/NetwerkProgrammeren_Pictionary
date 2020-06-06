@@ -3,6 +3,8 @@ package network.client;
 import GUI.DrawGUI;
 import GUI.LoginGUI;
 import data.DataSingleton;
+import data.DrawData;
+import javafx.scene.paint.Color;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -18,6 +20,8 @@ public class Client {
     private int port;
     private boolean isConnected = true;
     private Socket socket;
+    private DrawData newDrawData;
+    private boolean isDrawing = false;
 
     public static void main(String[] args){
         Client client = new Client();
@@ -69,10 +73,18 @@ public class Client {
 
             writeSocketThread.start();
 
+            Thread writeDrawDataSocketThread = new Thread( () -> {
+                if(isConnected){
+                    sendDrawDataFromSocket(out);
+                }
+            });
+
+            writeDrawDataSocketThread.start();
+
             Thread exitThread = new Thread( () -> {
                 while(true) {
                     if (!isConnected) {
-                        disconnect(readSocketThread, writeSocketThread);
+                        disconnect(readSocketThread, writeSocketThread, writeDrawDataSocketThread);
                     }
                     try {
                         Thread.sleep(100);
@@ -95,11 +107,12 @@ public class Client {
         isConnected = false;
     }
 
-    private void disconnect(Thread readThread, Thread writeThread) {
+    private void disconnect(Thread readThread, Thread writeThread, Thread drawDataThread) {
         try {
             socket.close();
             readThread.join();
             writeThread.join();
+            drawDataThread.join();
             System.exit(0);
         } catch (Exception e) {
             e.printStackTrace();
@@ -111,7 +124,17 @@ public class Client {
         while(isConnected) {
             try {
                 received = in.readUTF();
-                System.out.println(received);
+                if(received.substring(0,2).equals('\u0001' + ",")){
+                    if(!isDrawing) {
+                        Scanner scanner = new Scanner(received);
+                        scanner.useDelimiter(",");
+                        scanner.next();
+                        newDrawData = new DrawData(Integer.parseInt(scanner.next()), Integer.parseInt(scanner.next()), Integer.parseInt(scanner.next()), Color.BLACK);
+                        //System.out.println(newDrawData.toString());
+                    }
+                } else {
+                    System.out.println(received);
+                }
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -132,10 +155,29 @@ public class Client {
         startDisconnect();
     }
 
+    private void sendDrawDataFromSocket(DataOutputStream out){
+        newDrawData = new DrawData(50, 100, 20, Color.BLACK);
+        while(isConnected) {
+            while (isDrawing){
+                try {
+                    out.writeUTF(newDrawData.toString());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            try {
+                Thread.sleep(50);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
     public boolean hostSession(String nickname, int port){
         ServerHost serverHost = new ServerHost(port);
         Thread hostingThread = new Thread(serverHost);
         hostingThread.start();
+        isDrawing = true;
         return clientSetup(nickname, port);
     }
 }
