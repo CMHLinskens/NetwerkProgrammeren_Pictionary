@@ -48,11 +48,10 @@ public class Server {
                     this.clients.add(serverClient);
                 }
 
+                System.out.println("Client connected via address: " + socket.getInetAddress().getHostName());
                 System.out.println("Connected clients: " + this.clients.size());
 
-                for(ServerClient c : this.clients){
-                    c.writeUTF("Client connected via address: " + socket.getInetAddress().getHostName());
-                }
+                sendToAllClients("<" + nickName + "> : " + "Connected");
             }
 
             this.serverSocket.close();

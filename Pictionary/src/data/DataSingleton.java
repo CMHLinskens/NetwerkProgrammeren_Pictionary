@@ -10,6 +10,8 @@ public final class DataSingleton extends Observable {
     private Client client;
     private DrawData drawData;
     private boolean isDrawing;
+    private String message = "";
+    private String sendMessage = "";
 
     private DataSingleton() {
     }
@@ -42,5 +44,17 @@ public final class DataSingleton extends Observable {
     }
     public void setDrawing(boolean drawing) {
         isDrawing = drawing;
+    }
+    public String getMessage() {
+        return message;
+    }
+    public void setMessage(String message) {
+        this.message = message;
+    }
+    public String getSendMessage() {
+        return sendMessage;
+    }
+    public void setSendMessage(String sendMessage) {
+        this.sendMessage = sendMessage;
     }
 }

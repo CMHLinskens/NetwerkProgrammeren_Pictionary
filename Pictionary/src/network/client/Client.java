@@ -136,6 +136,7 @@ public class Client {
                     }
                 } else {
                     System.out.println(received);
+                    DataSingleton.getInstance().setMessage(received);
                 }
             } catch (IOException e) {
                 e.printStackTrace();
@@ -147,9 +148,10 @@ public class Client {
         String input = "";
         while(!input.equals("\\quit")) {
             try {
-                input = scanner.nextLine();
-
-                out.writeUTF(input);
+                if(!input.equals(DataSingleton.getInstance().getSendMessage())) {
+                    input = DataSingleton.getInstance().getSendMessage();
+                    out.writeUTF(input);
+                }
             } catch (IOException e) {
                 e.printStackTrace();
             }

@@ -1,5 +1,7 @@
 package network.server;
 
+import data.DataSingleton;
+
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;

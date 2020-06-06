@@ -11,6 +11,7 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -41,6 +42,13 @@ public class DrawGUI {
 
         applyPaintableMouse(drawG2d);
 
+        mainPane.setOnKeyPressed(e -> {
+            if(e.getCode().equals(KeyCode.ENTER)) {
+                DataSingleton.getInstance().setSendMessage(textFieldChatInput.getText());
+                textFieldChatInput.setText("");
+            }
+        });
+
         InvalidationListener listener = new InvalidationListener() {
             @Override
             public void invalidated(Observable o) {
@@ -62,6 +70,22 @@ public class DrawGUI {
         };
         DataSingleton.getInstance().addObserver(observer);
 
+        Thread messageThread = new Thread( () -> {
+            String lastMessage = "";
+            while(true){
+                if(!DataSingleton.getInstance().getMessage().equals(lastMessage)){
+                    lastMessage = DataSingleton.getInstance().getMessage();
+                    textAreaChat.setText(textAreaChat.getText() + '\n' + DataSingleton.getInstance().getMessage());
+                }
+                try {
+                    Thread.sleep(250);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        messageThread.start();
+
         stage.setScene(new Scene(mainPane));
         stage.setTitle("Pictionary");
         stage.show();
@@ -81,6 +105,7 @@ public class DrawGUI {
         VBox rightVBox = new VBox();
         textAreaChat = new TextArea();
         textAreaChat.setEditable(false);
+        textAreaChat.setWrapText(true);
         textFieldChatInput = new TextField();
         textFieldChatInput.setPromptText("Type your guess here...");
         rightVBox.getChildren().addAll(textAreaChat, textFieldChatInput);
