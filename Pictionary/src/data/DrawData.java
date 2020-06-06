@@ -27,4 +27,9 @@ public class DrawData {
     public Color getColor() {
         return color;
     }
+
+    @Override
+    public String toString() {
+        return "\01" + "," + getxPos() + "," + getyPos() + "," + getSize() + "," + getColor();
+    }
 }
