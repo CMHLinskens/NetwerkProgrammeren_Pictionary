@@ -1,6 +1,11 @@
 package network.server;
 
+import data.DataSingleton;
+import game.Game;
+
+import javax.xml.crypto.Data;
 import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -13,6 +18,8 @@ public class Server {
     private ArrayList<ServerClient> clients = new ArrayList<>();
     private ArrayList<Thread> clientThreads = new ArrayList<>();
     private boolean isRunning;
+    private int playerTagCounter = 0;
+    private Game game;
 
     public static void main(String[] args) {
         System.out.println("Server setting up");
@@ -39,7 +46,10 @@ public class Server {
                 DataInputStream in = new DataInputStream(socket.getInputStream());
                 String nickName = in.readUTF();
 
-                ServerClient serverClient = new ServerClient(socket, nickName, this);
+                DataOutputStream out = new DataOutputStream(socket.getOutputStream());
+                out.writeUTF(String.valueOf(playerTagCounter));
+
+                ServerClient serverClient = new ServerClient(socket, nickName, this, playerTagCounter);
                 Thread thread = new Thread(serverClient);
                 thread.start();
                 serverClient.setThread(thread);
@@ -48,10 +58,19 @@ public class Server {
                     this.clients.add(serverClient);
                 }
 
+                playerTagCounter++;
+
                 System.out.println("Client connected via address: " + socket.getInetAddress().getHostName());
                 System.out.println("Connected clients: " + this.clients.size());
 
                 sendToAllClients("<" + nickName + "> : " + "Connected");
+
+                DataSingleton.getInstance().setClients(this.clients);
+
+                if(this.clients.size() >= 2) {
+                    this.game = new Game(this, 3);
+                    game.run();
+                }
             }
 
             this.serverSocket.close();
@@ -71,6 +90,7 @@ public class Server {
     public void removeClient(ServerClient serverClient) {
         synchronized (this.clients) {
             this.clients.remove(serverClient);
+            DataSingleton.getInstance().setClients(this.clients);
         }
 
         Thread t = serverClient.getThread();
@@ -87,5 +107,9 @@ public class Server {
 
     public void terminate(){
         this.isRunning = false;
+    }
+
+    public void checkGuess(String received, ServerClient player) {
+        this.game.checkGuess(received, player);
     }
 }

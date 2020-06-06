@@ -5,6 +5,7 @@ import GUI.LoginGUI;
 import data.DataSingleton;
 import data.DrawData;
 
+import javax.xml.crypto.Data;
 import java.awt.*;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -22,8 +23,8 @@ public class Client {
     private int port;
     private boolean isConnected = true;
     private Socket socket;
-    private boolean isDrawing = false;
     private DrawData currentDrawData;
+    private int tag;
 
     public static void main(String[] args){
         Client client = new Client();
@@ -44,7 +45,6 @@ public class Client {
     private boolean connect(String nickName){
         System.out.println("Connecting to server: " + this.hostname + " on port " + this.port);
 
-        Scanner scanner = new Scanner(System.in);
         try {
             socket = new Socket(this.hostname, this.port);
             if(!socket.isConnected()) { return false; }
@@ -53,6 +53,8 @@ public class Client {
             DataOutputStream out = new DataOutputStream(socket.getOutputStream());
 
             out.writeUTF(nickName);
+
+            tag = Integer.parseInt(in.readUTF());
 
             System.out.println("You are now connected as " + nickName);
 
@@ -69,7 +71,7 @@ public class Client {
 
             Thread writeSocketThread = new Thread( () -> {
                 if(isConnected) {
-                    sendDataFromSocket(out, scanner);
+                    sendDataFromSocket(out);
                 }
             });
 
@@ -127,13 +129,29 @@ public class Client {
         while(isConnected) {
             try {
                 received = in.readUTF();
-                if(received.substring(0,2).equals('\u0001' + ",")){
+                if(received.substring(0,1).equals("\u0001")){
                     if(!DataSingleton.getInstance().isDrawing()) {
                         Scanner scanner = new Scanner(received);
                         scanner.useDelimiter(",");
                         scanner.next();
                         DataSingleton.getInstance().setDrawData(new DrawData(Integer.parseInt(scanner.next()), Integer.parseInt(scanner.next()), Integer.parseInt(scanner.next()), Color.black));
                     }
+                } else if (received.substring(0, 1).equals("\u0002")) {
+                    Scanner scanner = new Scanner(received);
+                    scanner.useDelimiter(",");
+                    scanner.next();
+                    int nextPlayer = Integer.parseInt(scanner.next());
+                    if(nextPlayer == this.tag)
+                        DataSingleton.getInstance().setDrawing(true);
+                    else
+                        DataSingleton.getInstance().setDrawing(false);
+
+                    DataSingleton.getInstance().setWordToGuess(scanner.next());
+                    System.out.println("Draw: " + DataSingleton.getInstance().getWordToGuess());
+                    if(scanner.hasNext())
+                        DataSingleton.getInstance().setCurrentRound(Integer.parseInt(scanner.next()));
+                } else if (received.substring(0, 1).equals("\u0003")) {
+                    System.out.println("You guessed correctly!");
                 } else {
                     System.out.println(received);
                     DataSingleton.getInstance().setMessage(received);
@@ -144,7 +162,7 @@ public class Client {
         }
     }
 
-    private void sendDataFromSocket(DataOutputStream out, Scanner scanner) {
+    private void sendDataFromSocket(DataOutputStream out) {
         String input = "";
         while(!input.equals("\\quit")) {
             try {

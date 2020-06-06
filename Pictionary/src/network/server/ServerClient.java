@@ -15,17 +15,30 @@ public class ServerClient implements Runnable{
     private Server server;
     private Thread thread;
     private boolean isConnected;
+    private boolean hasDrawn;
+    private final int tag;
 
     public Thread getThread() { return this.thread; }
     public void setThread(Thread thread) { this.thread = thread; }
     public String getName() {
         return name;
     }
+    public boolean hasDrawn() {
+        return hasDrawn;
+    }
+    public void setHasDrawn(boolean hasDrawn) {
+        this.hasDrawn = hasDrawn;
+    }
+    public int getTag() {
+        return tag;
+    }
 
-    public ServerClient(Socket socket, String name, Server server) {
+    public ServerClient(Socket socket, String name, Server server, int tag) {
         this.socket = socket;
         this.name = name;
         this.server = server;
+        this.hasDrawn = false;
+        this.tag = tag;
 
         try {
             this.in = new DataInputStream(socket.getInputStream());
@@ -54,10 +67,11 @@ public class ServerClient implements Runnable{
                     isConnected = false;
                     this.server.removeClient(this);
                 } else {
-                    if(received.substring(0, 2).equals('\u0001' + ",")){
+                    if(received.substring(0, 1).equals("\u0001")){
                         this.server.sendToAllClients(received);
                     } else {
                         this.server.sendToAllClients("<" + this.name + "> : " + received);
+                        this.server.checkGuess(received, this);
                     }
                 }
             } catch (IOException e) {
