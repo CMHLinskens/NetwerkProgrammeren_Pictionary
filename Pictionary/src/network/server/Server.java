@@ -43,7 +43,9 @@ public class Server {
                 thread.start();
                 serverClient.setThread(thread);
                 this.clientThreads.add(thread);
-                this.clients.add(serverClient);
+                synchronized (this.clients) {
+                    this.clients.add(serverClient);
+                }
 
                 System.out.println("Connected clients: " + this.clients.size());
 
@@ -59,14 +61,18 @@ public class Server {
         }
     }
 
-    public void sendToAllClients(String text){
-        for(ServerClient c : this.clients){
-            c.writeUTF(text);
+    public synchronized void sendToAllClients(String text){
+        synchronized (this.clients) {
+            for (ServerClient c : this.clients) {
+                c.writeUTF(text);
+            }
         }
     }
 
     public void removeClient(ServerClient serverClient) {
-        this.clients.remove(serverClient);
+        synchronized (this.clients) {
+            this.clients.remove(serverClient);
+        }
 
         Thread t = serverClient.getThread();
         try{

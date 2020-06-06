@@ -52,7 +52,11 @@ public class ServerClient implements Runnable{
                     isConnected = false;
                     this.server.removeClient(this);
                 } else {
-                    this.server.sendToAllClients("<" + this.name + "> : " + received);
+                    if(received.substring(0, 2).equals('\u0001' + ",")){
+                        this.server.sendToAllClients(received);
+                    } else {
+                        this.server.sendToAllClients("<" + this.name + "> : " + received);
+                    }
                 }
             } catch (IOException e) {
                 e.printStackTrace();
