@@ -20,7 +20,6 @@ public class Client {
     private int port;
     private boolean isConnected = true;
     private Socket socket;
-    private DrawData newDrawData;
     private boolean isDrawing = false;
 
     public static void main(String[] args){
@@ -72,6 +71,7 @@ public class Client {
             });
 
             writeSocketThread.start();
+            writeSocketThread.setPriority(6);
 
             Thread writeDrawDataSocketThread = new Thread( () -> {
                 if(isConnected){
@@ -129,7 +129,7 @@ public class Client {
                         Scanner scanner = new Scanner(received);
                         scanner.useDelimiter(",");
                         scanner.next();
-                        newDrawData = new DrawData(Integer.parseInt(scanner.next()), Integer.parseInt(scanner.next()), Integer.parseInt(scanner.next()), Color.BLACK);
+                        DataSingleton.getInstance().setDrawData(new DrawData(Integer.parseInt(scanner.next()), Integer.parseInt(scanner.next()), Integer.parseInt(scanner.next()), Color.BLACK));
                         //System.out.println(newDrawData.toString());
                     }
                 } else {
@@ -156,11 +156,11 @@ public class Client {
     }
 
     private void sendDrawDataFromSocket(DataOutputStream out){
-        newDrawData = new DrawData(50, 100, 20, Color.BLACK);
+        DataSingleton.getInstance().setDrawData(new DrawData(50, 100, 20, Color.BLACK));
         while(isConnected) {
             while (isDrawing){
                 try {
-                    out.writeUTF(newDrawData.toString());
+                    out.writeUTF(DataSingleton.getInstance().getDrawData().toString());
                 } catch (IOException e) {
                     e.printStackTrace();
                 }

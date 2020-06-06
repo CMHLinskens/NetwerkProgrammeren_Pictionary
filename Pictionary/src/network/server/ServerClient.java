@@ -44,7 +44,7 @@ public class ServerClient implements Runnable{
     }
 
     @Override
-    public synchronized void run() {
+    public void run() {
         while(isConnected){
             try {
                 String received = this.in.readUTF();

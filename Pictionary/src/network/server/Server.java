@@ -70,7 +70,9 @@ public class Server {
     }
 
     public void removeClient(ServerClient serverClient) {
-        this.clients.remove(serverClient);
+        synchronized (this.clients) {
+            this.clients.remove(serverClient);
+        }
 
         Thread t = serverClient.getThread();
         try{

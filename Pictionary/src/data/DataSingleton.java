@@ -6,6 +6,7 @@ public final class DataSingleton {
 
     private static DataSingleton INSTANCE;
     private Client client;
+    private DrawData drawData;
 
     private DataSingleton() {
     }
@@ -24,5 +25,11 @@ public final class DataSingleton {
     }
     public void setClient(Client client) {
         this.client = client;
+    }
+    public DrawData getDrawData() {
+        return drawData;
+    }
+    public void setDrawData(DrawData drawData) {
+        this.drawData = drawData;
     }
 }
