@@ -1,9 +1,13 @@
 package data;
 
+import network.client.Client;
+
+import java.util.ArrayList;
+
 public final class DataSingleton {
 
     private static DataSingleton INSTANCE;
-    private String info = "Initial info class";
+    private Client client;
 
     private DataSingleton() {
     }
@@ -17,4 +21,10 @@ public final class DataSingleton {
     }
 
     // getters and setters
+    public Client getClient() {
+        return client;
+    }
+    public void setClient(Client client) {
+        this.client = client;
+    }
 }

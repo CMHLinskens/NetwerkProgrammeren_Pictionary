@@ -66,11 +66,13 @@ public class Server {
 
         Thread t = serverClient.getThread();
         try{
+            this.clientThreads.remove(serverClient.getThread());
+            System.out.println("Client disconnected.");
+            sendToAllClients("<" + serverClient.getName() + "> : " + "Disconnected");
+            System.out.println("Connected clients: " + this.clients.size());
             t.join();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        this.clientThreads.remove(serverClient.getThread());
-        System.out.println("Connected clients: " + this.clients.size());
     }
 }

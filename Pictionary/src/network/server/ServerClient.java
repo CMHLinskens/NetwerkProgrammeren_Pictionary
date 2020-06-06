@@ -16,6 +16,9 @@ public class ServerClient implements Runnable{
 
     public Thread getThread() { return this.thread; }
     public void setThread(Thread thread) { this.thread = thread; }
+    public String getName() {
+        return name;
+    }
 
     public ServerClient(Socket socket, String name, Server server) {
         this.socket = socket;
@@ -51,7 +54,7 @@ public class ServerClient implements Runnable{
                 } else {
                     this.server.sendToAllClients("<" + this.name + "> : " + received);
                 }
-                } catch (IOException e) {
+            } catch (IOException e) {
                 e.printStackTrace();
             }
         }

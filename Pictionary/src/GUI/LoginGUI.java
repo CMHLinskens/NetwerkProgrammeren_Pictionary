@@ -1,5 +1,6 @@
 package GUI;
 
+import data.DataSingleton;
 import javafx.application.Application;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -42,7 +43,9 @@ public class LoginGUI extends Application{
 
             Button joinButton = new Button("Join");
             joinButton.setOnAction(e -> {
-
+                if(DataSingleton.getInstance().getClient().clientSetup(nickNameTextField.getText(), hostNameTextField.getText(), Integer.parseInt(portTextField.getText()))){
+                   stage.close();
+                }
             });
             Button hostButton = new Button("Host");
             hostButton.setOnAction(e -> {

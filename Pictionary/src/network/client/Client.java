@@ -1,6 +1,7 @@
 package network.client;
 
 import GUI.LoginGUI;
+import data.DataSingleton;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -15,64 +16,88 @@ public class Client {
     private String hostname;
     private int port;
     private boolean isConnected = true;
-
+    private Socket socket;
 
     public static void main(String[] args){
-        launch(LoginGUI.class);
         Client client = new Client();
-        client.clientSetup();
-        client.connect("Kees");
+        DataSingleton.getInstance().setClient(client);
+        launch(LoginGUI.class);
     }
 
     public Client(){
+    }
+
+    public boolean clientSetup(String nickname, String hostname, int port){
         this.hostname = hostname;
         this.port = port;
+
+        return connect(nickname);
     }
 
-    public void clientSetup(){
-        this.hostname = "MSI";
-        this.port = 25000;
-    }
-
-    public void connect(String nickName){
+    private boolean connect(String nickName){
         System.out.println("Connecting to server: " + this.hostname + " on port " + this.port);
 
         Scanner scanner = new Scanner(System.in);
         try {
-            Socket socket = new Socket(this.hostname, this.port);
+            socket = new Socket(this.hostname, this.port);
+            if(!socket.isConnected()) { return false; }
 
             DataInputStream in = new DataInputStream(socket.getInputStream());
             DataOutputStream out = new DataOutputStream(socket.getOutputStream());
 
-//            System.out.println("Enter a nickname: ");
-//            String nickName = scanner.nextLine();
             out.writeUTF(nickName);
 
             System.out.println("You are now connected as " + nickName);
 
-            String input = "";
-
             Thread readSocketThread = new Thread( () -> {
-                receiveDataFromSocket(in);
+                if(isConnected) {
+                    receiveDataFromSocket(in);
+                }
             });
 
             readSocketThread.start();
 
-            while(!input.equals("\\quit")){
-                input = scanner.nextLine();
-                out.writeUTF(input);
-            }
-        isConnected = false;
+            Thread writeSocketThread = new Thread( () -> {
+                if(isConnected) {
+                    sendDataFromSocket(out, scanner);
+                }
+            });
 
-            socket.close();
+            writeSocketThread.start();
 
-            try {
-                readSocketThread.join();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            Thread exitThread = new Thread( () -> {
+                while(true) {
+                    if (!isConnected) {
+                        disconnect(readSocketThread, writeSocketThread);
+                    }
+                    try {
+                        Thread.sleep(100);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+
+            exitThread.start();
 
         } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+        return true;
+    }
+
+    private void startDisconnect(){
+        isConnected = false;
+    }
+
+    private void disconnect(Thread readThread, Thread writeThread) {
+        try {
+            socket.close();
+            readThread.join();
+            writeThread.join();
+            System.exit(0);
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -87,5 +112,19 @@ public class Client {
                 e.printStackTrace();
             }
         }
+    }
+
+    private void sendDataFromSocket(DataOutputStream out, Scanner scanner) {
+        String input = "";
+        while(!input.equals("\\quit")) {
+            try {
+                input = scanner.nextLine();
+
+                out.writeUTF(input);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        startDisconnect();
     }
 }
