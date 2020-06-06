@@ -1,0 +1,15 @@
+Server
+* Client crashes after 2 players
+* Clients need list of other players
+* Character check when sending message
+* Something after the game is over
+* Timer needs to be added
+
+GUI
+* Timer needs to be shown top of screen
+* Word at top of screen
+* Clear screen after round
+* Clear screen on command
+* Ability to choose color
+* Ability to choose size
+* Ability to see other players (and score)
