@@ -19,7 +19,7 @@ public final class DataSingleton extends Observable {
     private String sendMessage = "";
 
     // Game variables
-    private String[] guessWords = {"fiets", "boot", "kaas", "worst", "yoghurt"};
+    private String[] guessWords = {"fiets", "boot", "worst", "deur", "kat", "auto", "augurk", "aardbei"};
     private String wordToGuess;
     private int rounds = 3;
     private int currentRound = 0;
