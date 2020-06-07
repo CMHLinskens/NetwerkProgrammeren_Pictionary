@@ -60,6 +60,7 @@ public class Game implements Runnable {
                     System.out.println(currentTime);
                     if(currentTime <= 0){
                         timeIsOver = true;
+                        timer.cancel();
                     }
                 }
             }, 0, 1000);
@@ -72,7 +73,7 @@ public class Game implements Runnable {
                     e.printStackTrace();
                 }
             }
-            this.timer.cancel();
+//            this.timer.cancel();
         }
     }
 
