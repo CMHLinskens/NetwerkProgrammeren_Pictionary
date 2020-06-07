@@ -67,9 +67,10 @@ public class Server {
 
                 DataSingleton.getInstance().setClients(this.clients);
 
-                if(this.clients.size() >= 2) {
+                if(this.clients.size() >= 2 && this.game == null) {
                     this.game = new Game(this, 3, 60);
-                    game.run();
+                    Thread gameThread = new Thread(this.game);
+                    gameThread.start();
                 }
             }
 

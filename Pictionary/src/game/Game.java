@@ -15,7 +15,6 @@ public class Game implements Runnable {
     private int currentTime;
     private Timer timer;
 
-
     public Game(Server server, int rounds, int turnTimer){
         this.server = server;
         this.turnTimer = turnTimer;
