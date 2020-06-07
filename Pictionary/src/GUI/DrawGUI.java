@@ -16,6 +16,7 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import org.jfree.fx.FXGraphics2D;
@@ -29,7 +30,6 @@ public class DrawGUI {
     private Canvas drawCanvas;
     private Canvas guessCanvas;
     private BorderPane mainPane;
-    private Button buttonVoteKick;
     private TextArea textAreaChat;
     private TextField textFieldChatInput;
     private Color selectedColor = Color.black;
@@ -116,11 +116,26 @@ public class DrawGUI {
 
         BorderPane borderPane = new BorderPane();
         VBox leftVBox = new VBox();
-        buttonVoteKick = new Button("VoteKick");
-        buttonVoteKick.setPrefWidth(150);
-        leftVBox.getChildren().add(buttonVoteKick);
+        HBox colorBox = new HBox();
+        Button blackButton = new Button("Black");
+        Button whiteButton = new Button("Eraser");
+        Button greyButton = new Button("Grey");
+        colorBox.getChildren().addAll(blackButton, greyButton, whiteButton);
+
+        HBox colorBox2 = new HBox();
+        Button redButton = new Button("Red");
+        Button greenButton = new Button("Green");
+        Button blueButton = new Button("Blue");
+        colorBox2.getChildren().addAll(redButton, greenButton, blueButton);
+
+        HBox sizeBox = new HBox();
+        Button smallButton = new Button("Small");
+        Button mediumButton = new Button("Medium");
+        Button bigButton = new Button("Big");
+        sizeBox.getChildren().addAll(smallButton, mediumButton, bigButton);
+
+        leftVBox.getChildren().addAll(colorBox, colorBox2, sizeBox);
         leftVBox.setAlignment(Pos.BOTTOM_LEFT);
-        leftVBox.setPrefWidth(150);
         borderPane.setLeft(leftVBox);
 
         VBox rightVBox = new VBox();
