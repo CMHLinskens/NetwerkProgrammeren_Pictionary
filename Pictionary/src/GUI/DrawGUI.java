@@ -2,16 +2,13 @@ package GUI;
 
 import data.DataSingleton;
 import data.DrawData;
-import javafx.application.Application;
 import javafx.beans.InvalidationListener;
-import javafx.beans.Observable;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
@@ -24,19 +21,19 @@ import org.jfree.fx.FXGraphics2D;
 import java.awt.*;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Rectangle2D;
+import java.util.ArrayList;
 import java.util.Observer;
 
 public class DrawGUI {
     private Canvas drawCanvas;
     private Canvas guessCanvas;
+    private Label[] playerLabels = new Label[6];
     private BorderPane mainPane;
     private TextArea textAreaChat;
     private TextField textFieldChatInput;
     private Color selectedColor = Color.black;
 
     public void start() {
-
-
         SimpleBooleanProperty isNextTurnProperty = DataSingleton.getInstance().getTurnSwitchIndicator();
         SimpleBooleanProperty isDrawingProperty = DataSingleton.getInstance().isDrawing();
 
@@ -47,6 +44,7 @@ public class DrawGUI {
         clearDrawCanvas(drawG2d);
         FXGraphics2D guessG2d = new FXGraphics2D(guessCanvas.getGraphicsContext2D());
         clearGuessCanvas(guessG2d);
+
 
         isNextTurnProperty.addListener((observable, oldValue, newValue) -> {
             if (oldValue != newValue) {
@@ -107,6 +105,27 @@ public class DrawGUI {
         });
         messageThread.start();
 
+        Thread playerListThread = new Thread(() -> {
+            ArrayList<String> playerList = (ArrayList<String>) DataSingleton.getInstance().getPlayers().clone();
+            while (true) {
+                if (!DataSingleton.getInstance().getPlayers().equals(playerList)) {
+                    System.out.println("wwwwAAA");
+                    playerList = (ArrayList<String>) DataSingleton.getInstance().getPlayers().clone();
+                    int i = 0;
+                    for (String player: playerList) {
+                        playerLabels[i].setText(player);
+                        i++;
+                    }
+                }
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        playerListThread.start();
+
         stage.setScene(new Scene(mainPane));
         stage.setTitle("Pictionary");
         stage.show();
@@ -116,6 +135,20 @@ public class DrawGUI {
 
         BorderPane borderPane = new BorderPane();
         VBox leftVBox = new VBox();
+
+
+        VBox playerVBox = new VBox();
+        playerVBox.setAlignment(Pos.TOP_LEFT);
+        for (int i = 0; i < playerLabels.length; i++) {
+            playerLabels[i] = new Label();
+            playerVBox.getChildren().add(playerLabels[i]);
+        }
+        leftVBox.getChildren().add(playerVBox);
+
+        HBox hBox = new HBox();
+        hBox.setMinHeight(445);
+        leftVBox.getChildren().add(hBox);
+
         HBox colorBox = new HBox();
         Button blackButton = new Button("Black");
         Button whiteButton = new Button("Eraser");
