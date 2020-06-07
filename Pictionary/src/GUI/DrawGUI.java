@@ -2,14 +2,9 @@ package GUI;
 
 import data.DataSingleton;
 import data.DrawData;
-import javafx.application.Application;
 import javafx.beans.InvalidationListener;
-import javafx.beans.Observable;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.geometry.Pos;
-import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.Button;
@@ -17,7 +12,6 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -62,6 +56,23 @@ public class DrawGUI {
         });
 
         applyPaintableMouse(drawG2d);
+
+        Thread timerThread = new Thread( () -> {
+            int lastCurrentTime = DataSingleton.getInstance().getCurrentTime();
+
+            while(true){
+                if(DataSingleton.getInstance().getCurrentTime() != lastCurrentTime){
+                    lastCurrentTime = DataSingleton.getInstance().getCurrentTime();
+                    drawTimer(guessG2d, DataSingleton.getInstance().getCurrentTime());
+                }
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        timerThread.start();
 
         mainPane.setOnKeyPressed(e -> {
             if (e.getCode().equals(KeyCode.ENTER)) {
@@ -213,5 +224,13 @@ public class DrawGUI {
             int xPos = (1150 / 2) - guessWord.length() * 20 + i * 40;
             guessG2d.drawString("_", xPos, 50);
         }
+    }
+
+    public void drawTimer(FXGraphics2D guessG2d, int currentTime){
+        guessG2d.clearRect(0, 0, 200, 55);
+        Font font = new Font("Comic Sans MS", Font.BOLD, 50);
+        guessG2d.setFont(font);
+
+        guessG2d.drawString(String.valueOf(currentTime), 100, 50);
     }
 }
