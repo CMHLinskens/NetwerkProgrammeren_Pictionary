@@ -26,6 +26,7 @@ public final class DataSingleton extends Observable {
     private int currentTimeServer;
     private SimpleBooleanProperty turnSwitchIndicator = new SimpleBooleanProperty(false);
     private Queue<DrawData> drawQueue = new LinkedList<>();
+    private ArrayList<String> players = new ArrayList<>();
 
     private DataSingleton() {
     }
@@ -127,5 +128,11 @@ public final class DataSingleton extends Observable {
     }
     public void setDrawQueue(Queue<DrawData> drawQueue) {
         this.drawQueue = drawQueue;
+    }
+    public ArrayList<String> getPlayers() {
+        return players;
+    }
+    public void setPlayers(ArrayList<String> players) {
+        this.players = players;
     }
 }

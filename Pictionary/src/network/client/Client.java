@@ -176,6 +176,17 @@ public class Client {
                     }
                     DataSingleton.getInstance().setDrawQueue(drawQueue);
 
+                } else if (received.substring(0, 1).equals("\u0005")) {
+                    Scanner scanner = new Scanner(received);
+                    scanner.useDelimiter(",");
+                    scanner.next();
+
+                    ArrayList<String> players = new ArrayList<>();
+                    while (scanner.hasNext()){
+                        players.add(scanner.next());
+                    }
+                    DataSingleton.getInstance().setPlayers(players);
+
                 } else {
                     System.out.println(received);
                     DataSingleton.getInstance().setMessage(received);

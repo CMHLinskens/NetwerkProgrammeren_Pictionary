@@ -74,6 +74,10 @@ public class Server {
                 if(this.clients.size() >= 2)
                     sendGameInfo(serverClient);
 
+                synchronized (this.clients) {
+                    sendUpdatePlayerList();
+                }
+
                 if(this.clients.size() >= 2 && this.game == null) {
                     this.game = new Game(this, 3, 60);
                     Thread gameThread = new Thread(this.game);
@@ -98,6 +102,7 @@ public class Server {
         synchronized (this.clients) {
             this.clients.remove(serverClient);
             DataSingleton.getInstance().setClients(this.clients);
+            sendUpdatePlayerList();
         }
 
         Thread t = serverClient.getThread();
@@ -139,5 +144,14 @@ public class Server {
         }
         joinString.delete(joinString.length(), joinString.length()+1);
         client.writeUTF(joinString.toString());
+    }
+
+    private void sendUpdatePlayerList(){
+        StringBuilder playerListBuilder = new StringBuilder("\u0005,");
+        for(ServerClient client : DataSingleton.getInstance().getClients()){
+            playerListBuilder.append(client.getName()).append(",");
+        }
+        playerListBuilder.delete(playerListBuilder.length(), playerListBuilder.length()+1);
+        sendToAllClients(playerListBuilder.toString());
     }
 }
