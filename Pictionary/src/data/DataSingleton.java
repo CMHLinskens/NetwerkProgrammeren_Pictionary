@@ -160,15 +160,9 @@ public final class DataSingleton extends Observable {
     public void setDrawQueue(Queue<DrawData> drawQueue) {
         this.drawQueue = drawQueue;
     }
-
     public ObservableList<String> getPlayers() {
         return players;
     }
-
-    public void setPlayers(ObservableList<String> players) {
-        this.players = players;
-    }
-
     public void addPlayers(ObservableList<String> players) {
         this.players.clear();
         this.players.addAll(players);

@@ -199,7 +199,6 @@ public class Client {
 
                         while (scanner.hasNext()) {
                             players.add(scanner.next());
-                            System.out.println("SCNANERRRRR");
                         }
                         DataSingleton.getInstance().addPlayers(players);
 

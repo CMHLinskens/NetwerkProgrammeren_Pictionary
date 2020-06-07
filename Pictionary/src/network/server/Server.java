@@ -119,10 +119,6 @@ public class Server {
         }
     }
 
-    public void terminate(){
-        this.isRunning = false;
-    }
-
     public void checkGuess(String received, ServerClient player) {
         this.game.checkGuess(received, player);
     }

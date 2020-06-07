@@ -4,6 +4,7 @@ import data.DataSingleton;
 import network.server.Server;
 import network.server.ServerClient;
 
+import javax.xml.crypto.Data;
 import java.util.*;
 
 public class Game implements Runnable {
@@ -12,14 +13,13 @@ public class Game implements Runnable {
     private HashMap<ServerClient, Boolean> playersWhoGuessed = new HashMap<>();
     private boolean timeIsOver;
     private int turnTimer;
-    private int currentTime;
     private Timer timer;
 
     public Game(Server server, int rounds, int turnTimer){
         this.server = server;
         this.turnTimer = turnTimer;
-        this.currentTime = this.turnTimer;
         this.timer = new Timer();
+        DataSingleton.getInstance().setCurrentTimeServer(turnTimer);
         DataSingleton.getInstance().setRounds(rounds);
         this.players = DataSingleton.getInstance().getClients();
         for(ServerClient player : DataSingleton.getInstance().getClients()){
@@ -54,7 +54,6 @@ public class Game implements Runnable {
             DataSingleton.getInstance().setCurrentTimeServer(this.turnTimer);
 
             // Check for new players who could have joined
-            //this.players.clear();
             for(ServerClient player : DataSingleton.getInstance().getClients()){
                 synchronized (this.players) {
                     if (!this.players.contains(player)){

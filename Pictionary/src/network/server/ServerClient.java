@@ -44,7 +44,6 @@ public class ServerClient implements Runnable{
         } catch (IOException e) {
             e.printStackTrace();
         }
-
         isConnected = true;
     }
 
