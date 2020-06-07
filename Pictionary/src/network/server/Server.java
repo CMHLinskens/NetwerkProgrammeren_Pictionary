@@ -129,7 +129,10 @@ public class Server {
         Scanner scanner = new Scanner(drawData);
         scanner.useDelimiter(",");
         scanner.next();
-        this.drawQueue.add(new DrawData(Integer.parseInt(scanner.next()), Integer.parseInt(scanner.next()), Integer.parseInt(scanner.next()), Color.black));
+        this.drawQueue.add(new DrawData(Integer.parseInt(scanner.next()),
+                                        Integer.parseInt(scanner.next()),
+                                        Integer.parseInt(scanner.next()),
+                                        new Color(Integer.parseInt(scanner.next()))));
     }
 
     public void resetDrawQueue(){

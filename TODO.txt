@@ -1,7 +1,5 @@
 Server
-* Clients need list of other players
 * Something after the game is over
-* Color needs to be reconstructed at arrival
 * Server needs to be closed when host quits the game
 * Not able to type same thing twice
 

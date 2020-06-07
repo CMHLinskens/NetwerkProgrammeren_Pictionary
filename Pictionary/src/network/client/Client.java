@@ -134,7 +134,10 @@ public class Client {
                         Scanner scanner = new Scanner(received);
                         scanner.useDelimiter(",");
                         scanner.next();
-                        DataSingleton.getInstance().setDrawData(new DrawData(Integer.parseInt(scanner.next()), Integer.parseInt(scanner.next()), Integer.parseInt(scanner.next()), Color.black));
+                        DataSingleton.getInstance().setDrawData(new DrawData(Integer.parseInt(scanner.next()),
+                                                                Integer.parseInt(scanner.next()),
+                                                                Integer.parseInt(scanner.next()),
+                                                                new Color(Integer.parseInt(scanner.next()))));
                     }
                 } else if (received.substring(0, 1).equals("\u0002")) {
                     Scanner scanner = new Scanner(received);
@@ -167,12 +170,13 @@ public class Client {
                     DataSingleton.getInstance().setCurrentTime(Integer.parseInt(scanner.next()));
                     setUpTimer();
 
-
                     LinkedList<DrawData> drawQueue = new LinkedList<>();
                     while(scanner.hasNext()){
                         scanner.next();
-                        drawQueue.add(new DrawData(Integer.parseInt(scanner.next()), Integer.parseInt(scanner.next()), Integer.parseInt(scanner.next()), Color.black));
-                        scanner.next();
+                        drawQueue.add(new DrawData(Integer.parseInt(scanner.next()),
+                                                    Integer.parseInt(scanner.next()),
+                                                    Integer.parseInt(scanner.next()),
+                                                    new Color(Integer.parseInt(scanner.next()))));
                     }
                     DataSingleton.getInstance().setDrawQueue(drawQueue);
 

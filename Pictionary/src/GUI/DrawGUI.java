@@ -32,6 +32,7 @@ public class DrawGUI {
     private Button buttonVoteKick;
     private TextArea textAreaChat;
     private TextField textFieldChatInput;
+    private Color selectedColor = Color.black;
 
     public void start() {
 
@@ -151,8 +152,9 @@ public class DrawGUI {
     public void applyPaintableMouse(FXGraphics2D drawG2d) {
         drawCanvas.setOnMouseDragged(e -> {
             if(DataSingleton.getInstance().isDrawing()) {
+                drawG2d.setColor(selectedColor);
                 drawG2d.fill(new Ellipse2D.Double(e.getX(), e.getY(), 10, 10));
-                DataSingleton.getInstance().setDrawData(new DrawData((int) e.getX(), (int) e.getY(), 10, Color.black));
+                DataSingleton.getInstance().setDrawData(new DrawData((int) e.getX(), (int) e.getY(), 10, selectedColor));
             }
         });
     }
