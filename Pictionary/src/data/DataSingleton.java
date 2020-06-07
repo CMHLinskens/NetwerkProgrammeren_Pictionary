@@ -4,8 +4,7 @@ import javafx.beans.property.SimpleBooleanProperty;
 import network.client.Client;
 import network.server.ServerClient;
 
-import java.util.ArrayList;
-import java.util.Observable;
+import java.util.*;
 
 public final class DataSingleton extends Observable {
 
@@ -24,7 +23,9 @@ public final class DataSingleton extends Observable {
     private ArrayList<ServerClient> clients;
     private boolean wordHasBeenGuessed = false;
     private int currentTime;
+    private int currentTimeServer;
     private SimpleBooleanProperty turnSwitchIndicator = new SimpleBooleanProperty(false);
+    private Queue<DrawData> drawQueue = new LinkedList<>();
 
     private DataSingleton() {
     }
@@ -114,5 +115,17 @@ public final class DataSingleton extends Observable {
     }
     public void setTurnSwitchIndicator(boolean switchTurnIndicator) {
         this.turnSwitchIndicator.set(switchTurnIndicator);
+    }
+    public int getCurrentTimeServer() {
+        return currentTimeServer;
+    }
+    public void setCurrentTimeServer(int currentTimeServer) {
+        this.currentTimeServer = currentTimeServer;
+    }
+    public Queue<DrawData> getDrawQueue() {
+        return drawQueue;
+    }
+    public void setDrawQueue(Queue<DrawData> drawQueue) {
+        this.drawQueue = drawQueue;
     }
 }

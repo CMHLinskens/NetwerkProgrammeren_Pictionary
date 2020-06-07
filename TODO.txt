@@ -1,8 +1,9 @@
 Server
-* Client crashes after 2 players
 * Clients need list of other players
 * Something after the game is over
-* Timer needs to be added
+* Color needs to be reconstructed at arrival
+* Server needs to be closed when host quits the game
+* Not able to type same thing twice
 
 GUI
 * Timer needs to be shown top of screen

@@ -1,15 +1,19 @@
 package network.server;
 
 import data.DataSingleton;
+import data.DrawData;
 import game.Game;
 
-import javax.xml.crypto.Data;
+import java.awt.*;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.Queue;
+import java.util.Scanner;
 
 public class Server {
 
@@ -20,6 +24,7 @@ public class Server {
     private boolean isRunning;
     private int playerTagCounter = 0;
     private Game game;
+    private Queue<DrawData> drawQueue = new LinkedList<>();
 
     public static void main(String[] args) {
         System.out.println("Server setting up");
@@ -66,6 +71,8 @@ public class Server {
                 sendToAllClients("<" + nickName + "> : " + "Connected");
 
                 DataSingleton.getInstance().setClients(this.clients);
+                if(this.clients.size() >= 2)
+                    sendGameInfo(serverClient);
 
                 if(this.clients.size() >= 2 && this.game == null) {
                     this.game = new Game(this, 3, 60);
@@ -73,7 +80,6 @@ public class Server {
                     gameThread.start();
                 }
             }
-
             this.serverSocket.close();
         } catch (IOException e) {
             e.printStackTrace();
@@ -112,5 +118,26 @@ public class Server {
 
     public void checkGuess(String received, ServerClient player) {
         this.game.checkGuess(received, player);
+    }
+
+    public void addToDrawQueue(String drawData){
+        Scanner scanner = new Scanner(drawData);
+        scanner.useDelimiter(",");
+        scanner.next();
+        this.drawQueue.add(new DrawData(Integer.parseInt(scanner.next()), Integer.parseInt(scanner.next()), Integer.parseInt(scanner.next()), Color.black));
+    }
+
+    public void resetDrawQueue(){
+        this.drawQueue.clear();
+    }
+
+    private void sendGameInfo(ServerClient client){
+        StringBuilder joinString = new StringBuilder("\u0004,");
+        joinString.append(DataSingleton.getInstance().getCurrentTimeServer()).append(",");
+        for(DrawData dD : drawQueue){
+            joinString.append(dD.toString()).append(",");
+        }
+        joinString.delete(joinString.length(), joinString.length()+1);
+        client.writeUTF(joinString.toString());
     }
 }

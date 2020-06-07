@@ -34,12 +34,12 @@ public class Game implements Runnable {
         this.timer.schedule(new TimerTask() {
             @Override
             public void run() {
-                if(currentTime <= 0){
+                if(DataSingleton.getInstance().getCurrentTimeServer() <= 0){
                     timeIsOver = true;
                 } else {
-                    currentTime--;
+                    DataSingleton.getInstance().setCurrentTimeServer(DataSingleton.getInstance().getCurrentTimeServer() - 1);
                 }
-                System.out.println(currentTime);
+                System.out.println(DataSingleton.getInstance().getCurrentTimeServer());
             }
         }, 0, 1000);
 
@@ -47,9 +47,11 @@ public class Game implements Runnable {
             DataSingleton.getInstance().setWordHasBeenGuessed(false);
             DataSingleton.getInstance().setWordToGuess(DataSingleton.getInstance().getGuessWords()[random.nextInt(DataSingleton.getInstance().getGuessWords().length)]);
 
+            this.server.resetDrawQueue();
+
             // Reset the timer
             this.timeIsOver = false;
-            this.currentTime = this.turnTimer;
+            DataSingleton.getInstance().setCurrentTimeServer(this.turnTimer);
 
             // Check for new players who could have joined
             for(ServerClient player : DataSingleton.getInstance().getClients()){

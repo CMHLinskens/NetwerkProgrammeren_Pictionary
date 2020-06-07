@@ -152,23 +152,30 @@ public class Client {
                         DataSingleton.getInstance().setCurrentRound(Integer.parseInt(scanner.next()));
 
                     DataSingleton.getInstance().setCurrentTime(this.turnTime);
-
-                    // Set turn timer
-                    this.timer.cancel();
-                    this.timer = new Timer();
-                    this.timer.schedule(new TimerTask() {
-                        @Override
-                        public void run() {
-                            if(DataSingleton.getInstance().getCurrentTime() > 0)
-                                DataSingleton.getInstance().setCurrentTime(DataSingleton.getInstance().getCurrentTime() - 1);
-                        }
-                    }, 0, 1000);
+                    setUpTimer();
 
                     // Indicate the turn has been switch to another player
                     DataSingleton.getInstance().setTurnSwitchIndicator(!DataSingleton.getInstance().getTurnSwitchIndicator().get());
 
                 } else if (received.substring(0, 1).equals("\u0003")) {
                     System.out.println("You guessed correctly!");
+                } else if (received.substring(0, 1).equals("\u0004")) {
+                    Scanner scanner = new Scanner(received);
+                    scanner.useDelimiter(",");
+                    scanner.next();
+
+                    DataSingleton.getInstance().setCurrentTime(Integer.parseInt(scanner.next()));
+                    setUpTimer();
+
+
+                    LinkedList<DrawData> drawQueue = new LinkedList<>();
+                    while(scanner.hasNext()){
+                        scanner.next();
+                        drawQueue.add(new DrawData(Integer.parseInt(scanner.next()), Integer.parseInt(scanner.next()), Integer.parseInt(scanner.next()), Color.black));
+                        scanner.next();
+                    }
+                    DataSingleton.getInstance().setDrawQueue(drawQueue);
+
                 } else {
                     System.out.println(received);
                     DataSingleton.getInstance().setMessage(received);
@@ -220,5 +227,17 @@ public class Client {
         hostingThread.start();
         DataSingleton.getInstance().setDrawing(true);
         return clientSetup(nickname, port);
+    }
+
+    private void setUpTimer(){
+        this.timer.cancel();
+        this.timer = new Timer();
+        this.timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                if(DataSingleton.getInstance().getCurrentTime() > 0)
+                    DataSingleton.getInstance().setCurrentTime(DataSingleton.getInstance().getCurrentTime() - 1);
+            }
+        }, 0, 1000);
     }
 }
