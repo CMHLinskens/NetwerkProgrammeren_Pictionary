@@ -24,7 +24,7 @@ public final class DataSingleton extends Observable {
     private ArrayList<ServerClient> clients;
     private boolean wordHasBeenGuessed = false;
     private int currentTime;
-    private SimpleBooleanProperty turnSwitchIndicator;
+    private SimpleBooleanProperty turnSwitchIndicator = new SimpleBooleanProperty();
 
     private DataSingleton() {
     }

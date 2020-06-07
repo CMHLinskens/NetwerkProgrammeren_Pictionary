@@ -31,13 +31,24 @@ public class Game implements Runnable {
     @Override
     public void run() {
         Random random = new Random();
-        int turn = 0;
+        // Setting up the turn timer
+        this.timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                if(currentTime <= 0){
+                    timeIsOver = true;
+                } else {
+                    currentTime--;
+                }
+                System.out.println(currentTime);
+            }
+        }, 0, 1000);
+
         while(DataSingleton.getInstance().getCurrentRound() <= DataSingleton.getInstance().getRounds()){
-            System.out.println(DataSingleton.getInstance().getCurrentRound() + " " + turn++);
             DataSingleton.getInstance().setWordHasBeenGuessed(false);
             DataSingleton.getInstance().setWordToGuess(DataSingleton.getInstance().getGuessWords()[random.nextInt(DataSingleton.getInstance().getGuessWords().length)]);
 
-            // Reset the clock
+            // Reset the timer
             this.timeIsOver = false;
             this.currentTime = this.turnTimer;
 
@@ -52,18 +63,6 @@ public class Game implements Runnable {
             }
             nextTurn();
 
-            // Set the new timer
-            this.timer.schedule(new TimerTask() {
-                @Override
-                public void run() {
-                    currentTime--;
-                    System.out.println(currentTime);
-                    if(currentTime <= 0){
-                        timeIsOver = true;
-                    }
-                }
-            }, 0, 1000);
-
             // Loop while a turn is played and wait for time to end or the word to be guessed by everyone.
             while(!DataSingleton.getInstance().wordHasBeenGuessed() && !this.timeIsOver){
                 try {
@@ -72,7 +71,6 @@ public class Game implements Runnable {
                     e.printStackTrace();
                 }
             }
-            this.timer.cancel();
         }
     }
 

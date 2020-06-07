@@ -154,12 +154,13 @@ public class Client {
                     DataSingleton.getInstance().setCurrentTime(this.turnTime);
 
                     // Set turn timer
+                    this.timer.cancel();
+                    this.timer = new Timer();
                     this.timer.schedule(new TimerTask() {
                         @Override
                         public void run() {
-                            DataSingleton.getInstance().setCurrentTime(DataSingleton.getInstance().getCurrentTime() - 1);
-                            if(DataSingleton.getInstance().getCurrentTime() <= 0)
-                                cancel();
+                            if(DataSingleton.getInstance().getCurrentTime() > 0)
+                                DataSingleton.getInstance().setCurrentTime(DataSingleton.getInstance().getCurrentTime() - 1);
                         }
                     }, 0, 1000);
 
