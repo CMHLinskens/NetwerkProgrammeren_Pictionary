@@ -105,6 +105,8 @@ public class Server {
             sendUpdatePlayerList();
         }
 
+        this.game.removePlayer(serverClient);
+
         Thread t = serverClient.getThread();
         try{
             this.clientThreads.remove(serverClient.getThread());

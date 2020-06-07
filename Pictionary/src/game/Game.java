@@ -54,13 +54,14 @@ public class Game implements Runnable {
             DataSingleton.getInstance().setCurrentTimeServer(this.turnTimer);
 
             // Check for new players who could have joined
+            //this.players.clear();
             for(ServerClient player : DataSingleton.getInstance().getClients()){
                 synchronized (this.players) {
-                    if (!this.players.contains(player))
+                    if (!this.players.contains(player)){
                         this.players.add(player);
+                        this.playersWhoGuessed.put(player, false);
+                    }
                 }
-                if(!this.playersWhoGuessed.containsKey(player))
-                    this.playersWhoGuessed.put(player, false);
             }
             nextTurn();
 
@@ -129,5 +130,10 @@ public class Game implements Runnable {
                 return;
         }
         DataSingleton.getInstance().setWordHasBeenGuessed(true);
+    }
+
+    public void removePlayer(ServerClient serverClient) {
+        this.playersWhoGuessed.remove(serverClient);
+        this.players.remove(serverClient);
     }
 }
