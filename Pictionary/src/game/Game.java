@@ -85,7 +85,10 @@ public class Game implements Runnable {
                 player.setHasDrawn(true);
                 // Resetting the guesses.
                 for(ServerClient playerGuess : playersWhoGuessed.keySet()){
-                    playersWhoGuessed.put(playerGuess, false);
+                    if(playerGuess.getTag() == tag)
+                        playersWhoGuessed.put(playerGuess, true);
+                    else
+                        playersWhoGuessed.put(playerGuess, false);
                 }
                 return;
             }
