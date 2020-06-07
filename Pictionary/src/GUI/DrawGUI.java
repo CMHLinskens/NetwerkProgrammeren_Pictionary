@@ -2,12 +2,18 @@ package GUI;
 
 import data.DataSingleton;
 import data.DrawData;
+import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.collections.ListChangeListener;
+import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
@@ -17,26 +23,48 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import org.jfree.fx.FXGraphics2D;
 
+import javax.xml.crypto.Data;
 import java.awt.*;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Rectangle2D;
+import java.util.ArrayList;
 import java.util.Observer;
+
+import static javafx.collections.FXCollections.observableArrayList;
 
 public class DrawGUI {
     private Canvas drawCanvas;
     private Canvas guessCanvas;
+    private Label[] playerLabels = new Label[6];
     private BorderPane mainPane;
     private TextArea textAreaChat;
     private TextField textFieldChatInput;
     private Color selectedColor = Color.black;
     private int selectedWidth = 20;
+    private ObservableList<String> playerList;
 
     public void start() {
-
-
         SimpleBooleanProperty isNextTurnProperty = DataSingleton.getInstance().getTurnSwitchIndicator();
         SimpleBooleanProperty isDrawingProperty = DataSingleton.getInstance().isDrawing();
+        playerList = DataSingleton.getInstance().getPlayers();
 
+
+         DataSingleton.getInstance().getPlayers().addListener((ListChangeListener<String>) c -> {
+             Platform.runLater(new Runnable() {
+                 @Override
+                 public void run() {
+
+                     int i = 0;
+                     for (String player : playerList) {
+                         playerLabels[i].setText(player);
+                         System.out.println(player + " : " + i);
+                         i++;
+                     }
+                 }
+             });
+        });
+
+        System.out.println(playerList.toString());
         Stage stage = new Stage();
         mainPane = getNewMainPane();
 
@@ -98,7 +126,7 @@ public class DrawGUI {
 
         isDrawingProperty.addListener((observable, oldValue, newValue) -> {
             System.out.println("isDrawingPorperty: " + newValue);
-            if(newValue)
+            if (newValue)
                 drawGuessedWord(guessG2d, DataSingleton.getInstance().getWordToGuess());
             else
                 drawGuessableWord(guessG2d, DataSingleton.getInstance().getWordToGuess());
@@ -130,6 +158,20 @@ public class DrawGUI {
 
         BorderPane borderPane = new BorderPane();
         VBox leftVBox = new VBox();
+
+
+        VBox playerVBox = new VBox();
+        playerVBox.setAlignment(Pos.TOP_LEFT);
+        for (int i = 0; i < playerLabels.length; i++) {
+            playerLabels[i] = new Label();
+            playerVBox.getChildren().add(playerLabels[i]);
+        }
+        leftVBox.getChildren().add(playerVBox);
+
+        HBox hBox = new HBox();
+        hBox.setMinHeight(445);
+        leftVBox.getChildren().add(hBox);
+
         HBox colorBox = new HBox();
         Button blackButton = new Button("Black");
         blackButton.setOnAction(e -> {selectedColor = Color.black;});

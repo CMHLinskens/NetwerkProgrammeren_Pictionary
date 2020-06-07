@@ -4,6 +4,7 @@ import GUI.DrawGUI;
 import GUI.LoginGUI;
 import data.DataSingleton;
 import data.DrawData;
+import javafx.collections.ObservableList;
 
 import javax.xml.crypto.Data;
 import java.awt.*;
@@ -14,6 +15,7 @@ import java.net.Socket;
 import java.util.*;
 
 import static javafx.application.Application.launch;
+import static javafx.collections.FXCollections.observableArrayList;
 
 public class Client {
 
@@ -193,11 +195,13 @@ public class Client {
                         scanner.useDelimiter(",");
                         scanner.next();
 
-                        ArrayList<String> players = new ArrayList<>();
+                        ObservableList<String> players = observableArrayList();
+
                         while (scanner.hasNext()) {
                             players.add(scanner.next());
+                            System.out.println("SCNANERRRRR");
                         }
-                        DataSingleton.getInstance().setPlayers(players);
+                        DataSingleton.getInstance().addPlayers(players);
 
                         break;
                     }
