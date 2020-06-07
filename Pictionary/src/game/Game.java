@@ -4,18 +4,22 @@ import data.DataSingleton;
 import network.server.Server;
 import network.server.ServerClient;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Random;
+import javax.xml.crypto.Data;
+import java.util.*;
 
 public class Game implements Runnable {
     private Server server;
     private ArrayList<ServerClient> players;
     private HashMap<ServerClient, Boolean> playersWhoGuessed = new HashMap<>();
+    private boolean timeIsOver;
+    private int turnTimer;
+    private Timer timer;
 
-
-    public Game(Server server, int rounds){
+    public Game(Server server, int rounds, int turnTimer){
         this.server = server;
+        this.turnTimer = turnTimer;
+        this.timer = new Timer();
+        DataSingleton.getInstance().setCurrentTimeServer(turnTimer);
         DataSingleton.getInstance().setRounds(rounds);
         this.players = DataSingleton.getInstance().getClients();
         for(ServerClient player : DataSingleton.getInstance().getClients()){
@@ -26,21 +30,42 @@ public class Game implements Runnable {
     @Override
     public void run() {
         Random random = new Random();
-        int turn = 0;
+        // Setting up the turn timer
+        this.timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                if(DataSingleton.getInstance().getCurrentTimeServer() <= 0){
+                    timeIsOver = true;
+                } else {
+                    DataSingleton.getInstance().setCurrentTimeServer(DataSingleton.getInstance().getCurrentTimeServer() - 1);
+                }
+                System.out.println(DataSingleton.getInstance().getCurrentTimeServer());
+            }
+        }, 0, 1000);
+
         while(DataSingleton.getInstance().getCurrentRound() <= DataSingleton.getInstance().getRounds()){
-            System.out.println(DataSingleton.getInstance().getCurrentRound() + " " + turn++);
             DataSingleton.getInstance().setWordHasBeenGuessed(false);
             DataSingleton.getInstance().setWordToGuess(DataSingleton.getInstance().getGuessWords()[random.nextInt(DataSingleton.getInstance().getGuessWords().length)]);
+
+            this.server.resetDrawQueue();
+
+            // Reset the timer
+            this.timeIsOver = false;
+            DataSingleton.getInstance().setCurrentTimeServer(this.turnTimer);
+
+            // Check for new players who could have joined
             for(ServerClient player : DataSingleton.getInstance().getClients()){
                 synchronized (this.players) {
-                    if (!this.players.contains(player))
+                    if (!this.players.contains(player)){
                         this.players.add(player);
+                        this.playersWhoGuessed.put(player, false);
+                    }
                 }
-                if(!this.playersWhoGuessed.containsKey(player))
-                    this.playersWhoGuessed.put(player, false);
             }
             nextTurn();
-            while(!DataSingleton.getInstance().wordHasBeenGuessed()){
+
+            // Loop while a turn is played and wait for time to end or the word to be guessed by everyone.
+            while(!DataSingleton.getInstance().wordHasBeenGuessed() && !this.timeIsOver){
                 try {
                     Thread.sleep(1000);
                 } catch (InterruptedException e) {
@@ -59,7 +84,10 @@ public class Game implements Runnable {
                 player.setHasDrawn(true);
                 // Resetting the guesses.
                 for(ServerClient playerGuess : playersWhoGuessed.keySet()){
-                    playersWhoGuessed.put(playerGuess, false);
+                    if(playerGuess.getTag() == tag)
+                        playersWhoGuessed.put(playerGuess, true);
+                    else
+                        playersWhoGuessed.put(playerGuess, false);
                 }
                 return;
             }
@@ -104,5 +132,10 @@ public class Game implements Runnable {
                 return;
         }
         DataSingleton.getInstance().setWordHasBeenGuessed(true);
+    }
+
+    public void removePlayer(ServerClient serverClient) {
+        this.playersWhoGuessed.remove(serverClient);
+        this.players.remove(serverClient);
     }
 }

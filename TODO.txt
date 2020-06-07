@@ -1,9 +1,7 @@
 Server
-* Client crashes after 2 players
-* Clients need list of other players
-* Character check when sending message
 * Something after the game is over
-* Timer needs to be added
+* Server needs to be closed when host quits the game
+* Not able to type same thing twice
 
 GUI
 * Timer needs to be shown top of screen

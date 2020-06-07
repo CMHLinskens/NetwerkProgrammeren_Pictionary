@@ -30,7 +30,6 @@ public class LoginGUI extends Application{
             labels.setSpacing(20);
 
             TextField nickNameTextField = new TextField();
-            nickNameTextField.setText("Default");
             TextField hostNameTextField = new TextField();
             hostNameTextField.setText("localhost");
             TextField portTextField = new TextField();
@@ -40,11 +39,6 @@ public class LoginGUI extends Application{
             textFields.setSpacing(10);
 
 
-            // FOR TESTING
-            nickNameTextField.setText("Default");
-            portTextField.setText("25000");
-            // ---
-
             HBox details = new HBox();
             details.getChildren().addAll(labels, textFields);
             details.setSpacing(25);
@@ -52,13 +46,13 @@ public class LoginGUI extends Application{
 
             Button joinButton = new Button("Join");
             joinButton.setOnAction(e -> {
-                if(DataSingleton.getInstance().getClient().clientSetup(nickNameTextField.getText(), Integer.parseInt(portTextField.getText()))){
+                if(DataSingleton.getInstance().getClient().clientSetup(nickNameTextField.getText(), Integer.parseInt(portTextField.getText()), hostNameTextField.getText())){
                    stage.close();
                 }
             });
             Button hostButton = new Button("Host");
             hostButton.setOnAction(e -> {
-                if(DataSingleton.getInstance().getClient().hostSession(nickNameTextField.getText(), Integer.parseInt(portTextField.getText()))){
+                if(DataSingleton.getInstance().getClient().hostSession(nickNameTextField.getText(), Integer.parseInt(portTextField.getText()), hostNameTextField.getText())){
                     stage.close();
                 }
             });

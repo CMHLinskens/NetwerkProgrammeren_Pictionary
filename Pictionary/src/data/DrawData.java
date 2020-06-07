@@ -30,6 +30,6 @@ public class DrawData {
 
     @Override
     public String toString() {
-        return "\01" + "," + getxPos() + "," + getyPos() + "," + getSize() + "," + getColor();
+        return "\01" + "," + getxPos() + "," + getyPos() + "," + getSize() + "," + getColor().getRGB();
     }
 }

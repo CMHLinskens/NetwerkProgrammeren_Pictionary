@@ -1,7 +1,5 @@
 package network.server;
 
-import data.DataSingleton;
-
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -46,7 +44,6 @@ public class ServerClient implements Runnable{
         } catch (IOException e) {
             e.printStackTrace();
         }
-
         isConnected = true;
     }
 
@@ -69,6 +66,7 @@ public class ServerClient implements Runnable{
                 } else {
                     if(received.substring(0, 1).equals("\u0001")){
                         this.server.sendToAllClients(received);
+                        this.server.addToDrawQueue(received);
                     } else {
                         this.server.sendToAllClients("<" + this.name + "> : " + received);
                         this.server.checkGuess(received, this);
