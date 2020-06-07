@@ -128,7 +128,7 @@ public class Client {
 
     private void receiveDataFromSocket(DataInputStream in){
         String received = "";
-        while(isConnected) {
+        while(!socket.isClosed()) {
             try {
                 received = in.readUTF();
                 switch (received.substring(0, 1)) {
@@ -218,7 +218,7 @@ public class Client {
 
     private void sendDataFromSocket(DataOutputStream out) {
         String input = "";
-        while(!input.equals("\\quit")) {
+        while(!input.equals("\\quit") && !socket.isClosed()) {
             try {
                 if(!input.equals(DataSingleton.getInstance().getSendMessage())) {
                     input = DataSingleton.getInstance().getSendMessage();
@@ -232,7 +232,7 @@ public class Client {
     }
 
     private void sendDrawDataFromSocket(DataOutputStream out){
-        while(isConnected) {
+        while(!socket.isClosed()) {
             while (DataSingleton.getInstance().isDrawing().get()){
                 try {
                     if(DataSingleton.getInstance().getDrawData() != currentDrawData) {
