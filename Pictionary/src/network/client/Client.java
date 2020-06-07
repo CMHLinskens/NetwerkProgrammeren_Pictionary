@@ -129,72 +129,82 @@ public class Client {
         while(isConnected) {
             try {
                 received = in.readUTF();
-                if(received.substring(0,1).equals("\u0001")){
-                    if(!DataSingleton.getInstance().isDrawing().getValue()) {
+                switch (received.substring(0, 1)) {
+                    case "\u0001":
+                        if (!DataSingleton.getInstance().isDrawing().getValue()) {
+                            Scanner scanner = new Scanner(received);
+                            scanner.useDelimiter(",");
+                            scanner.next();
+                            DataSingleton.getInstance().setDrawData(new DrawData(Integer.parseInt(scanner.next()),
+                                    Integer.parseInt(scanner.next()),
+                                    Integer.parseInt(scanner.next()),
+                                    new Color(Integer.parseInt(scanner.next()))));
+                        }
+                        break;
+                    case "\u0002": {
                         Scanner scanner = new Scanner(received);
                         scanner.useDelimiter(",");
                         scanner.next();
-                        DataSingleton.getInstance().setDrawData(new DrawData(Integer.parseInt(scanner.next()),
-                                                                Integer.parseInt(scanner.next()),
-                                                                Integer.parseInt(scanner.next()),
-                                                                new Color(Integer.parseInt(scanner.next()))));
+                        int nextPlayer = Integer.parseInt(scanner.next());
+
+                        DataSingleton.getInstance().setWordToGuess(scanner.next());
+                        System.out.println("Draw: " + DataSingleton.getInstance().getWordToGuess());
+                        if (scanner.hasNext())
+                            DataSingleton.getInstance().setCurrentRound(Integer.parseInt(scanner.next()));
+
+                        DataSingleton.getInstance().setCurrentTime(this.turnTime);
+                        setUpTimer();
+
+                        // Indicate the turn has been switch to another player
+                        DataSingleton.getInstance().setTurnSwitchIndicator(!DataSingleton.getInstance().getTurnSwitchIndicator().get());
+
+                        if (nextPlayer == this.tag)
+                            DataSingleton.getInstance().setDrawing(true);
+                        else
+                            DataSingleton.getInstance().setDrawing(false);
+
+                        break;
                     }
-                } else if (received.substring(0, 1).equals("\u0002")) {
-                    Scanner scanner = new Scanner(received);
-                    scanner.useDelimiter(",");
-                    scanner.next();
-                    int nextPlayer = Integer.parseInt(scanner.next());
-
-                    DataSingleton.getInstance().setWordToGuess(scanner.next());
-                    System.out.println("Draw: " + DataSingleton.getInstance().getWordToGuess());
-                    if(scanner.hasNext())
-                        DataSingleton.getInstance().setCurrentRound(Integer.parseInt(scanner.next()));
-
-                    DataSingleton.getInstance().setCurrentTime(this.turnTime);
-                    setUpTimer();
-
-                    // Indicate the turn has been switch to another player
-                    DataSingleton.getInstance().setTurnSwitchIndicator(!DataSingleton.getInstance().getTurnSwitchIndicator().get());
-
-                    if(nextPlayer == this.tag)
-                        DataSingleton.getInstance().setDrawing(true);
-                    else
-                        DataSingleton.getInstance().setDrawing(false);
-
-                } else if (received.substring(0, 1).equals("\u0003")) {
-                    System.out.println("You guessed correctly!");
-                } else if (received.substring(0, 1).equals("\u0004")) {
-                    Scanner scanner = new Scanner(received);
-                    scanner.useDelimiter(",");
-                    scanner.next();
-
-                    DataSingleton.getInstance().setCurrentTime(Integer.parseInt(scanner.next()));
-                    setUpTimer();
-
-                    LinkedList<DrawData> drawQueue = new LinkedList<>();
-                    while(scanner.hasNext()){
+                    case "\u0003":
+                        System.out.println("You guessed correctly!");
+                        break;
+                    case "\u0004": {
+                        Scanner scanner = new Scanner(received);
+                        scanner.useDelimiter(",");
                         scanner.next();
-                        drawQueue.add(new DrawData(Integer.parseInt(scanner.next()),
-                                                    Integer.parseInt(scanner.next()),
-                                                    Integer.parseInt(scanner.next()),
-                                                    new Color(Integer.parseInt(scanner.next()))));
+
+                        DataSingleton.getInstance().setCurrentTime(Integer.parseInt(scanner.next()));
+                        setUpTimer();
+
+                        LinkedList<DrawData> drawQueue = new LinkedList<>();
+                        while (scanner.hasNext()) {
+                            scanner.next();
+                            drawQueue.add(new DrawData(Integer.parseInt(scanner.next()),
+                                    Integer.parseInt(scanner.next()),
+                                    Integer.parseInt(scanner.next()),
+                                    new Color(Integer.parseInt(scanner.next()))));
+                        }
+                        DataSingleton.getInstance().setDrawQueue(drawQueue);
+
+                        break;
                     }
-                    DataSingleton.getInstance().setDrawQueue(drawQueue);
+                    case "\u0005": {
+                        Scanner scanner = new Scanner(received);
+                        scanner.useDelimiter(",");
+                        scanner.next();
 
-                } else if (received.substring(0, 1).equals("\u0005")) {
-                    Scanner scanner = new Scanner(received);
-                    scanner.useDelimiter(",");
-                    scanner.next();
+                        ArrayList<String> players = new ArrayList<>();
+                        while (scanner.hasNext()) {
+                            players.add(scanner.next());
+                        }
+                        DataSingleton.getInstance().setPlayers(players);
 
-                    ArrayList<String> players = new ArrayList<>();
-                    while (scanner.hasNext()){
-                        players.add(scanner.next());
+                        break;
                     }
-                    DataSingleton.getInstance().setPlayers(players);
-
-                } else {
-                    System.out.println(received);
-                    DataSingleton.getInstance().setMessage(received);
+                    default:
+                        System.out.println(received);
+                        DataSingleton.getInstance().setMessage(received);
+                        break;
                 }
             } catch (IOException e) {
                 e.printStackTrace();
