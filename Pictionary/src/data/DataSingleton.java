@@ -12,7 +12,7 @@ public final class DataSingleton extends Observable {
     private static DataSingleton INSTANCE;
     private Client client;
     private DrawData drawData;
-    private boolean isDrawing;
+    private SimpleBooleanProperty isDrawing = new SimpleBooleanProperty(false);
     private String message = "";
     private String sendMessage = "";
 
@@ -52,11 +52,11 @@ public final class DataSingleton extends Observable {
         setChanged();
         notifyObservers();
     }
-    public boolean isDrawing() {
+    public SimpleBooleanProperty isDrawing() {
         return isDrawing;
     }
     public void setDrawing(boolean drawing) {
-        isDrawing = drawing;
+        isDrawing.set(drawing);
     }
     public String getMessage() {
         return message;
