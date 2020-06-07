@@ -130,7 +130,7 @@ public class Client {
             try {
                 received = in.readUTF();
                 if(received.substring(0,1).equals("\u0001")){
-                    if(!DataSingleton.getInstance().isDrawing()) {
+                    if(!DataSingleton.getInstance().isDrawing().getValue()) {
                         Scanner scanner = new Scanner(received);
                         scanner.useDelimiter(",");
                         scanner.next();
@@ -144,10 +144,6 @@ public class Client {
                     scanner.useDelimiter(",");
                     scanner.next();
                     int nextPlayer = Integer.parseInt(scanner.next());
-                    if(nextPlayer == this.tag)
-                        DataSingleton.getInstance().setDrawing(true);
-                    else
-                        DataSingleton.getInstance().setDrawing(false);
 
                     DataSingleton.getInstance().setWordToGuess(scanner.next());
                     System.out.println("Draw: " + DataSingleton.getInstance().getWordToGuess());
@@ -159,6 +155,11 @@ public class Client {
 
                     // Indicate the turn has been switch to another player
                     DataSingleton.getInstance().setTurnSwitchIndicator(!DataSingleton.getInstance().getTurnSwitchIndicator().get());
+
+                    if(nextPlayer == this.tag)
+                        DataSingleton.getInstance().setDrawing(true);
+                    else
+                        DataSingleton.getInstance().setDrawing(false);
 
                 } else if (received.substring(0, 1).equals("\u0003")) {
                     System.out.println("You guessed correctly!");
@@ -218,7 +219,7 @@ public class Client {
 
     private void sendDrawDataFromSocket(DataOutputStream out){
         while(isConnected) {
-            while (DataSingleton.getInstance().isDrawing()){
+            while (DataSingleton.getInstance().isDrawing().get()){
                 try {
                     if(DataSingleton.getInstance().getDrawData() != currentDrawData) {
                         currentDrawData = DataSingleton.getInstance().getDrawData();
@@ -240,7 +241,6 @@ public class Client {
         ServerHost serverHost = new ServerHost(port);
         Thread hostingThread = new Thread(serverHost);
         hostingThread.start();
-        DataSingleton.getInstance().setDrawing(true);
         return clientSetup(nickname, port);
     }
 
