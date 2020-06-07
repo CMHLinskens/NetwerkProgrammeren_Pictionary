@@ -9,6 +9,7 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.Button;
@@ -16,6 +17,7 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -33,6 +35,7 @@ public class DrawGUI {
     private TextArea textAreaChat;
     private TextField textFieldChatInput;
     private Color selectedColor = Color.black;
+    private int selectedWidth = 20;
 
     public void start() {
 
@@ -118,21 +121,31 @@ public class DrawGUI {
         VBox leftVBox = new VBox();
         HBox colorBox = new HBox();
         Button blackButton = new Button("Black");
-        Button whiteButton = new Button("Eraser");
+        blackButton.setOnAction(e -> {selectedColor = Color.black;});
         Button greyButton = new Button("Grey");
+        greyButton.setOnAction(e -> {selectedColor = Color.gray;});
+        Button whiteButton = new Button("Eraser");
+        whiteButton.setOnAction(e -> {selectedColor = Color.white;});
         colorBox.getChildren().addAll(blackButton, greyButton, whiteButton);
 
         HBox colorBox2 = new HBox();
         Button redButton = new Button("Red");
+        redButton.setOnAction(e -> {selectedColor = Color.red;});
         Button greenButton = new Button("Green");
+        greenButton.setOnAction(e -> {selectedColor = Color.green;});
         Button blueButton = new Button("Blue");
+        blueButton.setOnAction(e -> {selectedColor = Color.blue;});
         colorBox2.getChildren().addAll(redButton, greenButton, blueButton);
 
         HBox sizeBox = new HBox();
         Button smallButton = new Button("Small");
+        smallButton.setOnAction(e -> {selectedWidth = 10;});
         Button mediumButton = new Button("Medium");
+        mediumButton.setOnAction(e -> {selectedWidth = 20;});
         Button bigButton = new Button("Big");
+        bigButton.setOnAction(e -> {selectedWidth = 32;});
         sizeBox.getChildren().addAll(smallButton, mediumButton, bigButton);
+
 
         leftVBox.getChildren().addAll(colorBox, colorBox2, sizeBox);
         leftVBox.setAlignment(Pos.BOTTOM_LEFT);
@@ -177,8 +190,8 @@ public class DrawGUI {
         drawCanvas.setOnMouseDragged(e -> {
             if (DataSingleton.getInstance().isDrawing().get()) {
                 drawG2d.setColor(selectedColor);
-                drawG2d.fill(new Ellipse2D.Double(e.getX(), e.getY(), 10, 10));
-                DataSingleton.getInstance().setDrawData(new DrawData((int) e.getX(), (int) e.getY(), 10, selectedColor));
+                drawG2d.fill(new Ellipse2D.Double(e.getX(), e.getY(), selectedWidth, selectedWidth));
+                DataSingleton.getInstance().setDrawData(new DrawData((int) e.getX(), (int) e.getY(), selectedWidth, selectedColor));
             }
         });
     }
