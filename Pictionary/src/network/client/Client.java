@@ -37,8 +37,8 @@ public class Client {
     public Client(){
     }
 
-    public boolean clientSetup(String nickname, int port){
-        this.hostname = "localhost";
+    public boolean clientSetup(String nickname, int port, String hostname){
+        this.hostname = hostname;
         this.port = port;
 
         return connect(nickname);
@@ -251,11 +251,11 @@ public class Client {
         }
     }
 
-    public boolean hostSession(String nickname, int port){
+    public boolean hostSession(String nickname, int port, String hostname){
         ServerHost serverHost = new ServerHost(port);
         Thread hostingThread = new Thread(serverHost);
         hostingThread.start();
-        return clientSetup(nickname, port);
+        return clientSetup(nickname, port, hostname);
     }
 
     private void setUpTimer(){

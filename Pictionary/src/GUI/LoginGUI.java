@@ -52,13 +52,13 @@ public class LoginGUI extends Application{
 
             Button joinButton = new Button("Join");
             joinButton.setOnAction(e -> {
-                if(DataSingleton.getInstance().getClient().clientSetup(nickNameTextField.getText(), Integer.parseInt(portTextField.getText()))){
+                if(DataSingleton.getInstance().getClient().clientSetup(nickNameTextField.getText(), Integer.parseInt(portTextField.getText()), hostNameTextField.getText())){
                    stage.close();
                 }
             });
             Button hostButton = new Button("Host");
             hostButton.setOnAction(e -> {
-                if(DataSingleton.getInstance().getClient().hostSession(nickNameTextField.getText(), Integer.parseInt(portTextField.getText()))){
+                if(DataSingleton.getInstance().getClient().hostSession(nickNameTextField.getText(), Integer.parseInt(portTextField.getText()), hostNameTextField.getText())){
                     stage.close();
                 }
             });
