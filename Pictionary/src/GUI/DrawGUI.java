@@ -5,6 +5,9 @@ import data.DrawData;
 import javafx.application.Application;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
@@ -32,6 +35,10 @@ public class DrawGUI {
 
     public void start() {
 
+
+        SimpleBooleanProperty isDrawingProperty = DataSingleton.getInstance().getTurnSwitchIndicator();
+
+
         Stage stage = new Stage();
         mainPane = getNewMainPane();
 
@@ -40,6 +47,13 @@ public class DrawGUI {
         FXGraphics2D guessG2d = new FXGraphics2D(guessCanvas.getGraphicsContext2D());
         clearGuessCanvas(guessG2d);
 
+        isDrawingProperty.addListener((observable, oldValue, newValue) -> {
+            if (oldValue != newValue) {
+                DataSingleton.getInstance().setDrawData(new DrawData(1, 1, 0, Color.white));
+                clearDrawCanvas(drawG2d);
+                System.out.println("Cleared Canvas");
+            }
+        });
         applyPaintableMouse(drawG2d);
 
         mainPane.setOnKeyPressed(e -> {
@@ -51,23 +65,16 @@ public class DrawGUI {
             }
         });
 
-        InvalidationListener listener = new InvalidationListener() {
-            @Override
-            public void invalidated(Observable o) {
-                textAreaChat.setPrefHeight(mainPane.getHeight() - 95);
-            }};
+        InvalidationListener listener = o -> textAreaChat.setPrefHeight(mainPane.getHeight() - 95);
 
         mainPane.widthProperty().addListener(listener);
         mainPane.heightProperty().addListener(listener);
 
-        Observer observer = new Observer() {
-            @Override
-            public void update(java.util.Observable o, Object arg) {
-                if(!DataSingleton.getInstance().isDrawing()) {
-                    DrawData drawData = DataSingleton.getInstance().getDrawData();
-                    drawG2d.setColor(drawData.getColor());
-                    drawG2d.fill(new Ellipse2D.Double(drawData.getxPos(), drawData.getyPos(), drawData.getSize(), drawData.getSize()));
-                }
+        Observer observer = (o, arg) -> {
+            if(!DataSingleton.getInstance().isDrawing()) {
+                DrawData drawData = DataSingleton.getInstance().getDrawData();
+                drawG2d.setColor(drawData.getColor());
+                drawG2d.fill(new Ellipse2D.Double(drawData.getxPos(), drawData.getyPos(), drawData.getSize(), drawData.getSize()));
             }
         };
         DataSingleton.getInstance().addObserver(observer);
