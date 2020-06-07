@@ -119,51 +119,35 @@ public class DrawGUI {
 
         BorderPane borderPane = new BorderPane();
         VBox leftVBox = new VBox();
-        GridPane colorButtons = new GridPane();
         HBox colorBox = new HBox();
         Button blackButton = new Button("Black");
         blackButton.setOnAction(e -> {selectedColor = Color.black;});
-//        colorButtons.add(blackButton, 0, 0);
         Button greyButton = new Button("Grey");
         greyButton.setOnAction(e -> {selectedColor = Color.gray;});
-//        colorButtons.add(greyButton, 1, 0);
         Button whiteButton = new Button("Eraser");
         whiteButton.setOnAction(e -> {selectedColor = Color.white;});
-//        colorButtons.add(whiteButton, 2, 0);
         colorBox.getChildren().addAll(blackButton, greyButton, whiteButton);
 
         HBox colorBox2 = new HBox();
         Button redButton = new Button("Red");
         redButton.setOnAction(e -> {selectedColor = Color.red;});
-//        colorButtons.add(redButton, 0, 1);
         Button greenButton = new Button("Green");
         greenButton.setOnAction(e -> {selectedColor = Color.green;});
-//        colorButtons.add(greenButton, 1, 1);
         Button blueButton = new Button("Blue");
         blueButton.setOnAction(e -> {selectedColor = Color.blue;});
-//        colorButtons.add(blueButton, 2, 1);
         colorBox2.getChildren().addAll(redButton, greenButton, blueButton);
 
         HBox sizeBox = new HBox();
         Button smallButton = new Button("Small");
         smallButton.setOnAction(e -> {selectedWidth = 10;});
-//        colorButtons.add(smallButton, 0, 2);
         Button mediumButton = new Button("Medium");
         mediumButton.setOnAction(e -> {selectedWidth = 20;});
-//        colorButtons.add(mediumButton, 1, 2);
         Button bigButton = new Button("Big");
         bigButton.setOnAction(e -> {selectedWidth = 32;});
-//        colorButtons.add(bigButton, 2, 2);
         sizeBox.getChildren().addAll(smallButton, mediumButton, bigButton);
-
-//        for(Node n : colorButtons.getChildren()){
-//            n.minWidth(50);
-//        }
-
 
 
         leftVBox.getChildren().addAll(colorBox, colorBox2, sizeBox);
-//        leftVBox.getChildren().add(colorButtons);
         leftVBox.setAlignment(Pos.BOTTOM_LEFT);
         borderPane.setLeft(leftVBox);
 
