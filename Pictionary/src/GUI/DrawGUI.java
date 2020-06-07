@@ -258,7 +258,9 @@ public class DrawGUI {
     }
 
     public void drawTimer(FXGraphics2D guessG2d, int currentTime){
+        guessG2d.setColor(Color.white);
         guessG2d.clearRect(0, 0, 200, 55);
+        guessG2d.setColor(Color.black);
         Font font = new Font("Comic Sans MS", Font.BOLD, 50);
         guessG2d.setFont(font);
 
