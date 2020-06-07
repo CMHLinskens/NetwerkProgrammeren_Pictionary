@@ -1,7 +1,6 @@
 Server
 * Client crashes after 2 players
 * Clients need list of other players
-* Character check when sending message
 * Something after the game is over
 * Timer needs to be added
 

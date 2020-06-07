@@ -44,8 +44,10 @@ public class DrawGUI {
 
         mainPane.setOnKeyPressed(e -> {
             if(e.getCode().equals(KeyCode.ENTER)) {
-                DataSingleton.getInstance().setSendMessage(textFieldChatInput.getText());
-                textFieldChatInput.setText("");
+                if(textFieldChatInput.getText().length() > 0) {
+                    DataSingleton.getInstance().setSendMessage(textFieldChatInput.getText());
+                    textFieldChatInput.setText("");
+                }
             }
         });
 
