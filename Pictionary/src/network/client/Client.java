@@ -11,9 +11,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
-import java.util.Observable;
-import java.util.Observer;
-import java.util.Scanner;
+import java.util.*;
 
 import static javafx.application.Application.launch;
 
@@ -25,6 +23,8 @@ public class Client {
     private Socket socket;
     private DrawData currentDrawData;
     private int tag;
+    private Timer timer = new Timer();
+    private int turnTime = 60;
 
     public static void main(String[] args){
         Client client = new Client();
@@ -150,6 +150,22 @@ public class Client {
                     System.out.println("Draw: " + DataSingleton.getInstance().getWordToGuess());
                     if(scanner.hasNext())
                         DataSingleton.getInstance().setCurrentRound(Integer.parseInt(scanner.next()));
+
+                    DataSingleton.getInstance().setCurrentTime(this.turnTime);
+
+                    // Set turn timer
+                    this.timer.schedule(new TimerTask() {
+                        @Override
+                        public void run() {
+                            DataSingleton.getInstance().setCurrentTime(DataSingleton.getInstance().getCurrentTime() - 1);
+                            if(DataSingleton.getInstance().getCurrentTime() <= 0)
+                                cancel();
+                        }
+                    }, 0, 1000);
+
+                    // Indicate the turn has been switch to another player
+                    DataSingleton.getInstance().setTurnSwitchIndicator(!DataSingleton.getInstance().getTurnSwitchIndicator().get());
+
                 } else if (received.substring(0, 1).equals("\u0003")) {
                     System.out.println("You guessed correctly!");
                 } else {

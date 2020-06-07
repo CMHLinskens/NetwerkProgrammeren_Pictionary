@@ -1,5 +1,6 @@
 package data;
 
+import javafx.beans.property.SimpleBooleanProperty;
 import network.client.Client;
 import network.server.ServerClient;
 
@@ -22,6 +23,8 @@ public final class DataSingleton extends Observable {
     private int currentRound = 0;
     private ArrayList<ServerClient> clients;
     private boolean wordHasBeenGuessed = false;
+    private int currentTime;
+    private SimpleBooleanProperty turnSwitchIndicator;
 
     private DataSingleton() {
     }
@@ -99,5 +102,17 @@ public final class DataSingleton extends Observable {
     }
     public void setWordHasBeenGuessed(boolean wordHasBeenGuessed) {
         this.wordHasBeenGuessed = wordHasBeenGuessed;
+    }
+    public int getCurrentTime() {
+        return currentTime;
+    }
+    public void setCurrentTime(int currentTime) {
+        this.currentTime = currentTime;
+    }
+    public SimpleBooleanProperty getTurnSwitchIndicator() {
+        return turnSwitchIndicator;
+    }
+    public void setTurnSwitchIndicator(boolean switchTurnIndicator) {
+        this.turnSwitchIndicator.set(switchTurnIndicator);
     }
 }

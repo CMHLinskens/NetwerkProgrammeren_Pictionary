@@ -4,18 +4,23 @@ import data.DataSingleton;
 import network.server.Server;
 import network.server.ServerClient;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Random;
+import java.util.*;
 
 public class Game implements Runnable {
     private Server server;
     private ArrayList<ServerClient> players;
     private HashMap<ServerClient, Boolean> playersWhoGuessed = new HashMap<>();
+    private boolean timeIsOver;
+    private int turnTimer;
+    private int currentTime;
+    private Timer timer;
 
 
-    public Game(Server server, int rounds){
+    public Game(Server server, int rounds, int turnTimer){
         this.server = server;
+        this.turnTimer = turnTimer;
+        this.currentTime = this.turnTimer;
+        this.timer = new Timer();
         DataSingleton.getInstance().setRounds(rounds);
         this.players = DataSingleton.getInstance().getClients();
         for(ServerClient player : DataSingleton.getInstance().getClients()){
@@ -31,6 +36,12 @@ public class Game implements Runnable {
             System.out.println(DataSingleton.getInstance().getCurrentRound() + " " + turn++);
             DataSingleton.getInstance().setWordHasBeenGuessed(false);
             DataSingleton.getInstance().setWordToGuess(DataSingleton.getInstance().getGuessWords()[random.nextInt(DataSingleton.getInstance().getGuessWords().length)]);
+
+            // Reset the clock
+            this.timeIsOver = false;
+            this.currentTime = this.turnTimer;
+
+            // Check for new players who could have joined
             for(ServerClient player : DataSingleton.getInstance().getClients()){
                 synchronized (this.players) {
                     if (!this.players.contains(player))
@@ -40,13 +51,28 @@ public class Game implements Runnable {
                     this.playersWhoGuessed.put(player, false);
             }
             nextTurn();
-            while(!DataSingleton.getInstance().wordHasBeenGuessed()){
+
+            // Set the new timer
+            this.timer.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    currentTime--;
+                    System.out.println(currentTime);
+                    if(currentTime <= 0){
+                        timeIsOver = true;
+                    }
+                }
+            }, 0, 1000);
+
+            // Loop while a turn is played and wait for time to end or the word to be guessed by everyone.
+            while(!DataSingleton.getInstance().wordHasBeenGuessed() && !this.timeIsOver){
                 try {
                     Thread.sleep(1000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
             }
+            this.timer.cancel();
         }
     }
 
