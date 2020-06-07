@@ -2,8 +2,13 @@ package GUI;
 
 import data.DataSingleton;
 import data.DrawData;
+import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.collections.ListChangeListener;
+import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
@@ -18,11 +23,14 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import org.jfree.fx.FXGraphics2D;
 
+import javax.xml.crypto.Data;
 import java.awt.*;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Observer;
+
+import static javafx.collections.FXCollections.observableArrayList;
 
 public class DrawGUI {
     private Canvas drawCanvas;
@@ -32,11 +40,30 @@ public class DrawGUI {
     private TextArea textAreaChat;
     private TextField textFieldChatInput;
     private Color selectedColor = Color.black;
+    private ObservableList<String> playerList;
 
     public void start() {
         SimpleBooleanProperty isNextTurnProperty = DataSingleton.getInstance().getTurnSwitchIndicator();
         SimpleBooleanProperty isDrawingProperty = DataSingleton.getInstance().isDrawing();
+        playerList = DataSingleton.getInstance().getPlayers();
 
+
+         DataSingleton.getInstance().getPlayers().addListener((ListChangeListener<String>) c -> {
+             Platform.runLater(new Runnable() {
+                 @Override
+                 public void run() {
+
+                     int i = 0;
+                     for (String player : playerList) {
+                         playerLabels[i].setText(player);
+                         System.out.println(player + " : " + i);
+                         i++;
+                     }
+                 }
+             });
+        });
+
+        System.out.println(playerList.toString());
         Stage stage = new Stage();
         mainPane = getNewMainPane();
 
@@ -44,7 +71,6 @@ public class DrawGUI {
         clearDrawCanvas(drawG2d);
         FXGraphics2D guessG2d = new FXGraphics2D(guessCanvas.getGraphicsContext2D());
         clearGuessCanvas(guessG2d);
-
 
         isNextTurnProperty.addListener((observable, oldValue, newValue) -> {
             if (oldValue != newValue) {
@@ -82,7 +108,7 @@ public class DrawGUI {
 
         isDrawingProperty.addListener((observable, oldValue, newValue) -> {
             System.out.println("isDrawingPorperty: " + newValue);
-            if(newValue)
+            if (newValue)
                 drawGuessedWord(guessG2d, DataSingleton.getInstance().getWordToGuess());
             else
                 drawGuessableWord(guessG2d, DataSingleton.getInstance().getWordToGuess());
@@ -104,27 +130,6 @@ public class DrawGUI {
             }
         });
         messageThread.start();
-
-        Thread playerListThread = new Thread(() -> {
-            ArrayList<String> playerList = (ArrayList<String>) DataSingleton.getInstance().getPlayers().clone();
-            while (true) {
-                if (!DataSingleton.getInstance().getPlayers().equals(playerList)) {
-                    System.out.println("wwwwAAA");
-                    playerList = (ArrayList<String>) DataSingleton.getInstance().getPlayers().clone();
-                    int i = 0;
-                    for (String player: playerList) {
-                        playerLabels[i].setText(player);
-                        i++;
-                    }
-                }
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-        playerListThread.start();
 
         stage.setScene(new Scene(mainPane));
         stage.setTitle("Pictionary");
